@@ -1,5 +1,5 @@
 LIB_ANTLR := lib/antlr.jar
-ANTLR_SCRIPT := Micro.g4
+ANTLR_SCRIPT := MicroLexer.g4
 
 all: group compiler
 
@@ -13,6 +13,6 @@ compiler:
 	mkdir classes
 	javac -cp $(LIB_ANTLR) -d classes src/*.java build/*.java
 clean:
-	rm -rf classes build
+	rm -rf classes build *.txt
 
 .PHONY: all group compiler clean

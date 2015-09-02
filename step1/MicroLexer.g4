@@ -1,35 +1,42 @@
-lexer grammar Micro;
+lexer grammar MicroLexer;
 
-KEYWORDS
+KEYWORD
     : 'PROGRAM' | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' | 'WRITE'
     | 'IF' | 'ELSE' | 'FI' | 'FOR' | 'ROF' | 'CONTINUE' | 'BREAK'
     | 'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT'
     ;
 
-OPERATORS
-    : '=' | ':' | '+' | '-' | '*' | '/' | '=' | '!='
+OPERATOR
+    : '=' | ':' | '+' | '-' | '*' | '/' | ':=' | '!='
     | '<' | '>' | '(' | ')' | ';' | ',' | '<=' | '>='
     ;
 
 fragment LETTER : ('a'..'z' | 'A'..'Z');
 fragment NUMBER : ('0'..'9');
+fragment WHITESPACE : (' ');
+fragment NEWLINE : ('\n' | '\r' | '\t');
 
 IDENTIFIER
     : (LETTER+)(LETTER | NUMBER)*
     ;
 
 INTLITERAL
-    : NUMBER+
+    : (NUMBER+)
     ;
 
 FLOATLITERAL
-    : (NUMBER*) ('.') (NUMBER+)
+    : (NUMBER*)('.')(NUMBER+)
     ;
 
 STRINGLITERAL
-    : ('"') (LETTER | NUMBER | OPERATORS)* ('"') ~('"')
+    //: ('"')(LETTER | NUMBER | OPERATOR)*('"')
+    :('"')(~('"'))*('"')
     ;
 
 COMMENT
-    : ('--') (~('\n'|'\r'))*
+    : ('--')(~('\n'|'\r'))*
+    ;
+
+FORMAT
+    : (WHITESPACE | NEWLINE)+
     ;

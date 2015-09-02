@@ -27,6 +27,7 @@ public class Micro {
 
     public static void main(String[] args) throws Exception
     {
+        tokenNameLookup.clear();
         formLookup();//forming the lookup table for token type
         String[] fileNames = {"fibonacci", "loop", "nested", "sqrt"};
         int index = 0;
@@ -39,13 +40,13 @@ public class Micro {
             MicroLexer lexer = new MicroLexer(text);
 
             //setup an output fie for current file, for diffing later
-            String outputFileName = fileNames[index] + "out.txt";
+            String outputFileName = fileNames[index] + "Out.txt";
             PrintWriter out = new PrintWriter(new File(outputFileName));
 
 
             while (true)
             {
-                //PrintWriter writer = new PrintWriter(fileNames[index] + "_out.txt");
+
 
                 Token token = lexer.nextToken();
                 if (token.getType() == MicroLexer.EOF) break;
@@ -59,14 +60,11 @@ public class Micro {
                 {
                     if (tokenValue.contains(" "))
                     {
-                        //System.out.println("Token Type: " + tokenType);
-                        //System.out.println("Value: \" \"");//show space as such
                         out.write("Token Type: " + tokenType + "\n");
                         out.write("Value: \" \" \n");
                     }
-                    else {
-                        //System.out.println("Token Type: " + tokenType);
-                        //System.out.println("Value: " + tokenValue);
+                    else
+                    {
                         out.write("Token Type: " + tokenType + "\n");
                         out.write("Value: " + tokenValue + "\n");
                     }

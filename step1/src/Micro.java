@@ -56,7 +56,7 @@ public class Micro {
                 String tokenValue = token.getText();
                 //boolean supress = tokenValue.contains("\n") || tokenValue.contains("\r") || tokenValue.contains("--");
 
-                if (!tokenType.equals("FORMAT"))//surpress irrelevat tokens
+                if (!tokenType.equals("FORMAT") && !tokenType.equals("STRINGLITERAL") && !tokenType.equals("COMMENT"))//surpress irrelevat tokens
                 {
                     if (tokenValue.contains(" "))
                     {
@@ -69,6 +69,11 @@ public class Micro {
                         out.write("Value: " + tokenValue + "\n");
                     }
 
+                }
+                if(tokenType.equals("STRINGLITERAL")) 
+                {
+                    out.write("Token Type: " + tokenType + "\n");
+                    out.write("Value: " + tokenValue + "\n");
                 }
 
             }

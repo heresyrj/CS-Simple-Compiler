@@ -1,4 +1,4 @@
-lexer grammar Micro
+lexer grammar Micro;
 
 KEYWORDS
     : 'PROGRAM' | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' | 'WRITE'

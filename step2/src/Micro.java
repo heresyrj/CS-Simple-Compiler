@@ -1,36 +1,9 @@
 import java.io.*;
-import java.util.HashMap;
-import java.util.Scanner;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 
 public class Micro {
-
-/*--------------------------------------------STATIC METHOND-----------------------------------------------------*/
-    //Token Loopup Hashmap for all testcases to use
-    //set as static
-    private static HashMap<Integer, String> tokenNameLookup = new HashMap<Integer, String>();
-
-
-    public static void formLookup () throws FileNotFoundException
-    {
-        Scanner tokenScan = new Scanner(new File("/Users/jianruan/Developer/468STEP2/build/Micro.tokens"));
-        while (tokenScan.hasNextLine())
-        {
-            String line = tokenScan.nextLine();
-            //System.out.println(line);
-            int splitPoint = line.indexOf('=');
-            //System.out.println(""+splitPoint);
-            String typeName = line.substring(0, splitPoint);//this is token type name
-            int key = Integer.parseInt((line.substring(splitPoint + 1)));//this is int value of that type
-            tokenNameLookup.put(key, typeName);
-        }
-
-    }
-
-
-/*-------------------------------------------------------------------------------------------------------------*/
 
     MicroLexer lexer;
     TokenStream tokenStream;
@@ -61,32 +34,19 @@ public class Micro {
     }
 
 
-
-    /*-------------------------------------------------------------------------------------------------------------*/
-
     public static void main(String[] args) throws IOException, RecognitionException
     {
-        //Step1
-        //form token lookup table
-        //form testcases input array.
-        tokenNameLookup.clear();
-        formLookup();//forming the lookup table for token type
-
-
-        //Step2
-        //each round is to test 1 testcase
 
         Micro newTest = new Micro(args[0]);
         //program will exit here if encounters any error
 
         String treeString = newTest.tree.toStringTree(newTest.parser);
-        System.out.println(treeString);
+        //System.out.println(treeString);
 
         if (!treeString.isEmpty())
         {
             System.out.println("Accepted");
         }
-
 
     }
 }

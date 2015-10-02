@@ -10,7 +10,7 @@ public class funcSymbol extends Symbol {
 
     public funcSymbol(String name, Scope parent) {
         super("FUNCTION", name, parent);
-        funcScope = new Scope("LOCAL", parent);
+        funcScope = new Scope("GLOBAL", parent);
     }
 
     public Scope getOwnScope() {

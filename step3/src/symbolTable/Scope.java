@@ -58,6 +58,7 @@ public class Scope {
             } else if (type.equals("BLOCK")) {
                 //to be implemented
 
+
             } else {
                 System.out.print("name ");
                 System.out.print(name + " ");

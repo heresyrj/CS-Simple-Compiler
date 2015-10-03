@@ -5,11 +5,18 @@ package symbolTable;
  */
 public class blockSymbol extends Symbol {
 
-    private Scope scope;
+    private Scope blockScope;
 
-    public blockSymbol(String name, Scope parent, Scope scope) {
-        super("BLOCK", name, scope);
+    public blockSymbol(String name, Scope parent) {
+        super("BLOCK", name, parent);
+        blockScope = new Scope("BLOCK", parent);
     }
+    
+    public Scope getOwnScope() {
+        return blockScope;
+    }
+    
+    
 
 
 }

@@ -104,7 +104,7 @@ public class myMicroListener extends MicroBaseListener {
     @Override
     public void exitVar_decl(MicroParser.Var_declContext var_declContext)
     {
-
+    	
     }
 
     /**
@@ -134,7 +134,12 @@ public class myMicroListener extends MicroBaseListener {
         IF statement
      */
     @Override
-    public void enterIf_stmt(MicroParser.If_stmtContext if_stmtContext) { /* compiled code */ }
+    public void enterIf_stmt(MicroParser.If_stmtContext if_stmtContext) {  
+    	Scope current = getCurrentScope();
+    	blockSymbol bs = new blockSymbol("temp", current);
+    	setCurrentScope(bs.getOwnScope());
+    	setimmediatePrev(bs);
+    }
 
     @Override
     public void exitIf_stmt(MicroParser.If_stmtContext if_stmtContext) {
@@ -145,7 +150,12 @@ public class myMicroListener extends MicroBaseListener {
         ELSE statement
      */
     @Override
-    public void enterElse_part(MicroParser.Else_partContext else_partContext) { /* compiled code */ }
+    public void enterElse_part(MicroParser.Else_partContext else_partContext) { 
+    	Scope current = getCurrentScope();
+    	blockSymbol bs = new blockSymbol("temp", current);
+    	setCurrentScope(bs.getOwnScope());
+    	setimmediatePrev(bs); 
+    }
 
     @Override
     public void exitElse_part(MicroParser.Else_partContext else_partContext) {
@@ -156,7 +166,12 @@ public class myMicroListener extends MicroBaseListener {
         FOR statement
      */
     @Override
-    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext) { /* compiled code */ }
+    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext) { 
+    	Scope current = getCurrentScope();
+    	blockSymbol bs = new blockSymbol("temp", current);
+    	setCurrentScope(bs.getOwnScope());
+    	setimmediatePrev(bs);
+    }
 
     @Override
     public void exitFor_stmt(MicroParser.For_stmtContext for_stmtContext) {

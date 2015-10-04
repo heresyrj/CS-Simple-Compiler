@@ -14,7 +14,7 @@ public class Micro {
     myMicroListener listener;
     ParseTree tree;//ParseTree is essentially an interface.
     ParserRuleContext prc;//ParserRuleContext implemented the ParseTree interface and other interfaces as well
-    Scope globalScope;
+    Scope wrapperScope;
 
     public Micro(String filePath) throws IOException, RecognitionException {
         //PART A: LEXER
@@ -33,17 +33,17 @@ public class Micro {
         errorHandler = new MyErrorHandler();
         parser.setErrorHandler(errorHandler);//assume parser class throws RecognitionException
 
+
         //PART E: add listener to for parsing
         parser.setBuildParseTree(true);//check API for explanation
-        listener = new myMicroListener();
+        wrapperScope = new Scope("wrapper", null);
+        listener = new myMicroListener(wrapperScope);
         parser.addParseListener(listener);//associate the listener with parser
 
         //PART E: Start to parse and get tree
         prc = parser.program();//refer to ANTLR4 Book p239
         tree = prc;
 
-        //PART F: after parsing, get global scope
-        globalScope = listener.getGlobal();
     }
 
 
@@ -53,7 +53,7 @@ public class Micro {
         Micro newTest = new Micro(args[0]);
 
         //print symbol table
-        newTest.globalScope.printSymbols();
+        newTest.wrapperScope.printSymbols();
 
 
         System.out.println();

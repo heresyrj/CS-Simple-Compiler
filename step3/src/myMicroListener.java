@@ -1,5 +1,6 @@
 import symbolTable.*;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 
@@ -7,52 +8,70 @@ import java.util.Stack;
  * Created by jianruan on 9/20/15.
  */
 public class myMicroListener extends MicroBaseListener {
+    private Scope wrapperScope;
     private Scope global;
-    private Scope current;
-    private Scope parent;
-    private Symbol immediatePrev;
-    private Stack<Symbol> symStack;
+    private Scope currentScope;
+    private Scope parentScope;
+    private Symbol prevSymbol;
+    private String currentType;
+    private ArrayList<Symbol> symBuffer;
+    private Stack<String> idStack;
+    private int blockcounter;
 
-    public myMicroListener() {
-        global = null;
-        current = null;
-        immediatePrev = null;
-        parent = null;
-        symStack = new Stack<>();
+
+    public myMicroListener(Scope wrapperScope)
+    {
+        this.wrapperScope = wrapperScope;
+        symBuffer = new ArrayList<>();
+        idStack = new Stack<>();
+        blockcounter = 1;
     }
 
     /**************************************************************************
      ************************ Symbol Table Generation *************************
      **************************************************************************/
 
-    //getter for global scope
-    public Scope getGlobal() {
-        return global;
+    //Setter & Getter for currentScope
+    void setCurrentScope(Scope cs) {
+        currentScope = cs;
     }
-
-    //setter for current scope
-    void setCurrentScope(Scope sc) {
-        current = sc;
-    }
-
-    //getter for current scope
     Scope getCurrentScope() {
-        return current;
+        return currentScope;
     }
 
-    //setter for the symbol immediate before id
-    void setimmediatePrev(Symbol s) {
-        immediatePrev = s;
+    //Setter & Getter for parentScope
+    void setParentScope(Scope ps) {
+        parentScope = ps;
+    }
+    Scope getParentScope() {
+        return parentScope;
     }
 
-    //getter for the symbol immediate before id
-    Symbol getimmediatePrev() {
-        return immediatePrev;
+    //Setter & Getter  the currentSymbol
+    void setCurrentType(String t) {
+        currentType = t;
+    }
+    String getCurrentType() {return currentType;}
+
+    //Setter & Getter  the currentType
+    void setCurrentSymbol(Symbol s) {
+        prevSymbol = s;
+    }
+    Symbol getCurrentSymbol() {
+        return prevSymbol;
     }
 
-    //add symbol
+    //add symbol to currentScope
     void addSymboltoCurrentScope(Symbol s) {
-        current.addSymbol(s);
+        currentScope.addSymbol(s);
+    }
+
+    void saveBuffertoCurrentScope() {
+        while(!symBuffer.isEmpty())
+        {
+            Symbol s = symBuffer.remove(0);
+            getCurrentScope().addSymbol(s);
+        }
     }
 
 
@@ -63,17 +82,22 @@ public class myMicroListener extends MicroBaseListener {
     public void enterProgram(MicroParser.ProgramContext programContext) {
         //create a new and only program symbol
         programSymbol ps = new programSymbol("temp", null);
+        wrapperScope.addSymbol(ps);
         //Program scope is essentially also the global scope
         //right now the parent scope is null or global;
         global = ps.getOwnScope();
-        current = global;
-        //set immediatePrev symbol as null
-        setimmediatePrev(null);
+        setCurrentScope(global);
+        //set currentSymbol as null
+        setCurrentSymbol(ps);
+        //set currentType as PROGRAM
+        setCurrentType("PROGRAM");
     }
 
     @Override
-    public void exitProgram(MicroParser.ProgramContext programContext) {
-        programContext.id();
+    public void exitProgram(MicroParser.ProgramContext programContext)
+    {
+        //dump all the global level symbols into the list
+        saveBuffertoCurrentScope();
     }
 
     /**
@@ -84,7 +108,11 @@ public class myMicroListener extends MicroBaseListener {
         STRING
      */
     @Override
-    public void enterString_decl(MicroParser.String_declContext string_declContext) { /* compiled code */ }
+    public void enterString_decl(MicroParser.String_declContext string_declContext)
+    {
+        //set currentType as PROGRAM
+        setCurrentType("STRING");
+    }
 
     @Override
     public void exitString_decl(MicroParser.String_declContext string_declContext) {
@@ -92,8 +120,8 @@ public class myMicroListener extends MicroBaseListener {
         String value = string_declContext.str().getText();
         //create str symbol
         strSymbol newStr = new strSymbol(name, value, getCurrentScope());
-        //add to current scope
-        addSymboltoCurrentScope(newStr);
+        //add to stack
+        symBuffer.add(newStr);
     }
     /**
         INT and FLOAT
@@ -104,7 +132,84 @@ public class myMicroListener extends MicroBaseListener {
     @Override
     public void exitVar_decl(MicroParser.Var_declContext var_declContext)
     {
-    	
+        String type = var_declContext.var_type().getText();
+
+        //get id_list handler
+        MicroParser.Id_listContext id_list = var_declContext.id_list();
+        //get num of id
+
+        Symbol newVar = null;
+        while (!idStack.isEmpty())
+        {
+            //get single id
+            //MicroParser.IdContext id = id_list.getChild(id_list.id().getClass(), index);
+            String name = idStack.pop();
+
+            //create symbol with found type and push to stack
+            switch (type) {
+                case "INT":
+                    intSymbol newInt = new intSymbol(name, currentScope);
+                    newVar = (Symbol)newInt;
+                    break;
+                case "FLOAT":
+                    floatSymbol newFloat = new floatSymbol(name, currentScope);
+                    newVar = (Symbol)newFloat;
+                    break;
+                default:
+                    System.out.println("Error, found type is " + type);
+                    break;
+            }
+            if (newVar != null) {
+                symBuffer.add(newVar);
+            } else {
+                System.out.println("Error occurs in listener class line 128");
+            }
+        }
+
+
+    }
+    public void enterVar_type(MicroParser.Var_typeContext ctx)
+    {
+        setCurrentType("UNDEFINED");
+        if (!idStack.isEmpty()) {
+            //System.out.println("idStack is not empty before enter in new type, stack cleared, but check.");
+            idStack.clear();
+        }
+    }
+
+    @Override
+    public void exitVar_type(MicroParser.Var_typeContext ctx)
+    {
+        //set type before encounter steam of ids
+        //such that can react accordingly
+        //check exitID()
+        String type = ctx.getText();
+        setCurrentType(type);
+    }
+
+
+    @Override
+    public void exitId(MicroParser.IdContext ctx)
+    {
+        String id = ctx.getText();
+        switch (currentType) {
+            case "PROGRAM":
+                wrapperScope.getSymbol(0).sym_setName(id);
+                break;
+            case "FUNCTION":
+                idStack.push(id);
+                break;
+            case "INT":
+                idStack.push(id);
+                break;
+            case "FLOAT":
+                idStack.push(id);
+                break;
+            case "STRING":
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -115,68 +220,132 @@ public class myMicroListener extends MicroBaseListener {
      */
     @Override
     public void enterFunc_decl(MicroParser.Func_declContext func_declContext) {
-        Scope current = getCurrentScope();
         //create a new func symbol
+        Scope current = getCurrentScope();
         funcSymbol fs = new funcSymbol("temp", current);
+        symBuffer.add(fs);
+
+        //dump symbols got so far into current scope
+        saveBuffertoCurrentScope();
+
+        //set the parent scope
+        setParentScope(current);
         //set the current scope is that of the program, the real global scope
         setCurrentScope(fs.getOwnScope());
-        //set immediatePrev symbol as this func
-        setimmediatePrev(fs);
+
+        //set currentType as FUNCTION
+        setCurrentType("FUNCTION");
     }
 
     @Override
     public void exitFunc_decl(MicroParser.Func_declContext func_declContext) {
-        //change the scope when exit a func decl
+        //dump all this func level symbols into its list
+        saveBuffertoCurrentScope();
+
+        //get properties of functions
+        String funcName = func_declContext.id().getText();
+        String returnType = func_declContext.any_type().getText();
+
+
+        //change the scope to parent scope when exit a func decl
         setCurrentScope(getCurrentScope().getParentScope());
+        //if parent is not null, get its parent
+        if (getCurrentScope() != null) {
+            setParentScope(getCurrentScope().getParentScope());
+        }
+
+        //set the name and return type of the function
+        //now, it's the last element in the parent symbol list
+        funcSymbol thisFunc = (funcSymbol)getCurrentScope().getLastSymbol();
+        thisFunc.sym_setName(funcName);
+        thisFunc.setReturnType(returnType);
+
     }
 
     /**
         IF statement
      */
     @Override
-    public void enterIf_stmt(MicroParser.If_stmtContext if_stmtContext) {  
-    	Scope current = getCurrentScope();
-    	blockSymbol bs = new blockSymbol("temp", current);
-    	setCurrentScope(bs.getOwnScope());
-    	setimmediatePrev(bs);
+    public void enterIf_stmt(MicroParser.If_stmtContext if_stmtContext)
+    {
+        //create a new block symbol
+        Scope current = getCurrentScope();
+        String name = "BLOCK " + blockcounter;
+        blockSymbol bs = new blockSymbol(name, current);
+        symBuffer.add(bs);
+
+        //save symbol got so far into current scope list
+        saveBuffertoCurrentScope();
+
+        //set the parent scope
+        setParentScope(current);
+        //set the current scope is that of the program, the real global scope
+        setCurrentScope(bs.getOwnScope());
+
+        //increment counter
+        blockcounter++;
+
+        //set currentType as IF
+        setCurrentType("IF");
     }
 
     @Override
     public void exitIf_stmt(MicroParser.If_stmtContext if_stmtContext) {
-        //change the scope when exit a if block
+
+        //dump all the global level symbols into the list
+        saveBuffertoCurrentScope();
+
+        //change the scope to parent scope when exit a block
         setCurrentScope(getCurrentScope().getParentScope());
-    }
-    /**
-        ELSE statement
-     */
-    @Override
-    public void enterElse_part(MicroParser.Else_partContext else_partContext) { 
-    	Scope current = getCurrentScope();
-    	blockSymbol bs = new blockSymbol("temp", current);
-    	setCurrentScope(bs.getOwnScope());
-    	setimmediatePrev(bs); 
+        //now current is parent
+        //if parent is not null, get its parent
+        if (getCurrentScope() != null) {
+            setParentScope(getCurrentScope().getParentScope());
+        }
+
     }
 
-    @Override
-    public void exitElse_part(MicroParser.Else_partContext else_partContext) {
-        //change the scope when exit a else block
-        setCurrentScope(getCurrentScope().getParentScope());
-    }
     /**
         FOR statement
      */
     @Override
-    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext) { 
-    	Scope current = getCurrentScope();
-    	blockSymbol bs = new blockSymbol("temp", current);
-    	setCurrentScope(bs.getOwnScope());
-    	setimmediatePrev(bs);
+    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext)
+    {
+        //create a new block symbol
+        Scope current = getCurrentScope();
+        String name = "BLOCK " + blockcounter;
+        blockSymbol bs = new blockSymbol(name, current);
+        symBuffer.add(bs);
+
+        //save symbol got so far into current scope list
+        saveBuffertoCurrentScope();
+
+        //set the parent scope
+        setParentScope(current);
+        //set the current scope is that of the program, the real global scope
+        setCurrentScope(bs.getOwnScope());
+
+        //increment counter
+        blockcounter++;
+
+        //set currentType as IF
+        setCurrentType("FOR");
     }
 
     @Override
-    public void exitFor_stmt(MicroParser.For_stmtContext for_stmtContext) {
-        //return to parent scope after exit for stmt
+    public void exitFor_stmt(MicroParser.For_stmtContext for_stmtContext)
+    {
+        //dump all the global level symbols into the list
+        saveBuffertoCurrentScope();
+
+        //change the scope to parent scope when exit a block
         setCurrentScope(getCurrentScope().getParentScope());
+        //now current is parent
+        //if parent is not null, get its parent
+        if (getCurrentScope() != null) {
+            setParentScope(getCurrentScope().getParentScope());
+        }
+
     }
 
     /**************************************************************************

@@ -7,16 +7,13 @@ public class blockSymbol extends Symbol {
 
     private Scope blockScope;
 
-    public blockSymbol(String name, Scope parent) {
+    public blockSymbol(String name, Scope parent)
+    {
         super("BLOCK", name, parent);
-        blockScope = new Scope("BLOCK", parent);
+        blockScope = new Scope(name, parent);
     }
-    
+
     public Scope getOwnScope() {
         return blockScope;
     }
-    
-    
-
-
 }

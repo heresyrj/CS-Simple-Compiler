@@ -22,6 +22,11 @@ public class Scope {
     public Symbol getSymbol(int i) {
         return symbolList.get(i);
     }
+    public Symbol getLastSymbol()
+    {
+        int num = symbolList.size();
+        return getSymbol(num - 1);
+    }
 
     public void addSymbol(Symbol s) {
         symbolList.add(s);
@@ -40,13 +45,14 @@ public class Scope {
 
             if (type.equals("PROGRAM")) {
                 //part1
-                System.out.print("Symbol table Global");
+                System.out.print("Symbol table Global\n");
                 //part2
                 programSymbol ps = (programSymbol) s;
                 //
                 ps.getOwnScope().printSymbols();
 
             } else if (type.equals("FUNCTION")) {
+                System.out.println("\n");
                 //part1
                 System.out.print("Symbol table " + name);
                 //part2
@@ -56,8 +62,8 @@ public class Scope {
                 System.out.println();//add one empty line
 
             } else if (type.equals("BLOCK")) {
-                //to be implemented
-
+                System.out.println("\n");
+                System.out.print("Symbol table BLOCK");
 
             } else {
                 System.out.print("name ");

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Hashtable;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -46,10 +47,12 @@ public class Micro {
     }
 
 
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) throws Exception
+    {
         //program will exit here if encounters any error, handled in my ErrorHandler
         Micro newTest = new Micro(args[0]);
+
+        //
 
         //print symbol table
         newTest.wrapperScope.printSymbols();

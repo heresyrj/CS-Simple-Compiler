@@ -27,9 +27,24 @@ public class Scope {
         int num = symbolList.size();
         return getSymbol(num - 1);
     }
+    public String getName() {return name;}
 
     public void addSymbol(Symbol s) {
-        symbolList.add(s);
+
+        boolean containSame = false;
+
+        for (Symbol sym : symbolList) {
+            boolean bool1 = sym.sym_getName().equals(s.sym_getName());
+            boolean bool2 = sym.sym_getType().equals(s.sym_getType());
+            if (bool1 && bool2) containSame = true;
+        }
+
+        if(containSame){
+            System.out.println("DECLARATION ERROR " + s.sym_getName());
+            System.exit(9);
+        } else {
+            symbolList.add(s);
+        }
     }
 
     public Scope getParentScope() {

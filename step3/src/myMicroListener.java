@@ -1,5 +1,8 @@
 import symbolTable.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedList;
 
 
 /**
@@ -57,11 +60,6 @@ public class myMicroListener extends MicroBaseListener {
     }
     Symbol getCurrentSymbol() {
         return prevSymbol;
-    }
-
-    //add symbol to currentScope
-    void addSymboltoCurrentScope(Symbol s) {
-        currentScope.addSymbol(s);
     }
 
     void saveBuffertoCurrentScope() {
@@ -136,44 +134,19 @@ public class myMicroListener extends MicroBaseListener {
         MicroParser.Id_listContext id_list = var_declContext.id_list();
         //get num of id
 
-        Symbol newVar = null;
-        while (!idStack.isEmpty())
-        {
-            //get single id
-            //MicroParser.IdContext id = id_list.getChild(id_list.id().getClass(), index);
-            String name = idStack.remove(0);
-
-            //create symbol with found type and push to stack
-            switch (type) {
-                case "INT":
-                    intSymbol newInt = new intSymbol(name, currentScope);
-                    newVar = (Symbol)newInt;
-                    break;
-                case "FLOAT":
-                    floatSymbol newFloat = new floatSymbol(name, currentScope);
-                    newVar = (Symbol)newFloat;
-                    break;
-                default:
-                    System.out.println("Error, found type is " + type);
-                    break;
-            }
-            if (newVar != null) {
-                symBuffer.add(newVar);
-            } else {
-                System.out.println("Error occurs in listener class line 128");
-            }
-        }
-
-
+        //dump id in stack, create symbol, and add to symbol list
+        add_symbol_from_idStack(type);
     }
     public void enterVar_type(MicroParser.Var_typeContext ctx)
     {
         setCurrentType("UNDEFINED");
-        if (!idStack.isEmpty()) {
-            //System.out.println("idStack is not empty before enter in new type, stack cleared, but check.");
-            idStack.clear();
-        }
     }
+
+    public void enterStmt_list(MicroParser.Stmt_listContext stmt_listContext)
+    {
+        setCurrentType("UNDEFINED");
+    }
+
 
     @Override
     public void exitVar_type(MicroParser.Var_typeContext ctx)
@@ -185,6 +158,11 @@ public class myMicroListener extends MicroBaseListener {
         setCurrentType(type);
     }
 
+    @Override
+    public void enterParam_decl_list(MicroParser.Param_decl_listContext param_decl_listContext)
+    {
+    }
+
 
     @Override
     public void exitId(MicroParser.IdContext ctx)
@@ -193,9 +171,6 @@ public class myMicroListener extends MicroBaseListener {
         switch (currentType) {
             case "PROGRAM":
                 wrapperScope.getSymbol(0).sym_setName(id);
-                break;
-            case "FUNCTION":
-                idStack.add(id);
                 break;
             case "INT":
                 idStack.add(id);
@@ -237,6 +212,9 @@ public class myMicroListener extends MicroBaseListener {
 
     @Override
     public void exitFunc_decl(MicroParser.Func_declContext func_declContext) {
+        //dump id in stack, create symbol, and add to symbol list
+        add_symbol_from_idStack("INT");
+
         //dump all this func level symbols into its list
         saveBuffertoCurrentScope();
 
@@ -266,46 +244,48 @@ public class myMicroListener extends MicroBaseListener {
     @Override
     public void enterIf_stmt(MicroParser.If_stmtContext if_stmtContext)
     {
-        //create a new block symbol
-        Scope current = getCurrentScope();
-        String name = "BLOCK " + blockcounter;
-        blockSymbol bs = new blockSymbol(name, current);
-        symBuffer.add(bs);
-
-        //save symbol got so far into current scope list
-        saveBuffertoCurrentScope();
-
-        //set the parent scope
-        setParentScope(current);
-        //set the current scope is that of the program, the real global scope
-        setCurrentScope(bs.getOwnScope());
-
-        //increment counter
-        blockcounter++;
-
-        //set currentType as IF
-        setCurrentType("IF");
+        if_else_for_ENTER("IF");
     }
 
     @Override
-    public void exitIf_stmt(MicroParser.If_stmtContext if_stmtContext) {
-
-        //dump all the global level symbols into the list
-        saveBuffertoCurrentScope();
-
-        //change the scope to parent scope when exit a block
-        setCurrentScope(getCurrentScope().getParentScope());
-        //now current is parent
-        //if parent is not null, get its parent
-        if (getCurrentScope() != null) {
-            setParentScope(getCurrentScope().getParentScope());
-        }
-
+    public void exitIf_stmt(MicroParser.If_stmtContext if_stmtContext)
+    {
+        if_else_for_EXIT();
     }
 
     @Override
     public void enterElse_part(MicroParser.Else_partContext else_partContext)
     {
+        if_else_for_ENTER("ELSE");
+    }
+
+    @Override
+    public void exitElse_part(MicroParser.Else_partContext else_partContext)
+    {
+        if_else_for_EXIT();
+    }
+
+
+    /**
+     FOR statement
+     */
+    @Override
+    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext)
+    {
+        if_else_for_ENTER("FOR");
+    }
+
+    @Override
+    public void exitFor_stmt(MicroParser.For_stmtContext for_stmtContext)
+    {
+        if_else_for_EXIT();
+    }
+
+    /**
+
+     */
+    private void if_else_for_ENTER(String which)
+    {
         //create a new block symbol
         Scope current = getCurrentScope();
         String name = "BLOCK " + blockcounter;
@@ -323,12 +303,11 @@ public class myMicroListener extends MicroBaseListener {
         //increment counter
         blockcounter++;
 
-        //set currentType as IF
-        setCurrentType("ELSE");
+        //set currentType as "which"
+        setCurrentType(which);
     }
 
-    @Override
-    public void exitElse_part(MicroParser.Else_partContext else_partContext)
+    private void if_else_for_EXIT()
     {
         //dump all the global level symbols into the list
         saveBuffertoCurrentScope();
@@ -342,47 +321,32 @@ public class myMicroListener extends MicroBaseListener {
         }
     }
 
+    private void add_symbol_from_idStack(String type) {
 
+        Symbol newVar = null;
+        while (!idStack.isEmpty())
+        {
+            //get single id
+            //MicroParser.IdContext id = id_list.getChild(id_list.id().getClass(), index);
+            String name = idStack.remove(0);
 
-    /**
-        FOR statement
-     */
-    @Override
-    public void enterFor_stmt(MicroParser.For_stmtContext for_stmtContext)
-    {
-        //create a new block symbol
-        Scope current = getCurrentScope();
-        String name = "BLOCK " + blockcounter;
-        blockSymbol bs = new blockSymbol(name, current);
-        symBuffer.add(bs);
-
-        //save symbol got so far into current scope list
-        saveBuffertoCurrentScope();
-
-        //set the parent scope
-        setParentScope(current);
-        //set the current scope is that of the program, the real global scope
-        setCurrentScope(bs.getOwnScope());
-
-        //increment counter
-        blockcounter++;
-
-        //set currentType as IF
-        setCurrentType("FOR");
-    }
-
-    @Override
-    public void exitFor_stmt(MicroParser.For_stmtContext for_stmtContext)
-    {
-        //dump all the global level symbols into the list
-        saveBuffertoCurrentScope();
-
-        //change the scope to parent scope when exit a block
-        setCurrentScope(getCurrentScope().getParentScope());
-        //now current is parent
-        //if parent is not null, get its parent
-        if (getCurrentScope() != null) {
-            setParentScope(getCurrentScope().getParentScope());
+            //create symbol with found type and push to stack
+            switch (type) {
+                case "INT":
+                    newVar = new intSymbol(name, currentScope);
+                    break;
+                case "FLOAT":
+                    newVar = new floatSymbol(name, currentScope);
+                    break;
+                default:
+                    System.out.println("Error, found type is " + type);
+                    break;
+            }
+            if (newVar != null) {
+                symBuffer.add(newVar);
+            } else {
+                System.out.println("Error occurs in listener class line 128");
+            }
         }
 
     }

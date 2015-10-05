@@ -76,7 +76,7 @@ public class Scope {
 
             } else if (type.equals("BLOCK")) {
                 System.out.println("\n");
-                System.out.print("Symbol table " + name);
+                System.out.println("Symbol table " + name);
                 blockSymbol bs = (blockSymbol) s;
                 bs.getOwnScope().printSymbols();
             } else {

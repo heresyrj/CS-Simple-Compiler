@@ -161,6 +161,13 @@ public class myMicroListener extends MicroBaseListener {
     @Override
     public void enterParam_decl_list(MicroParser.Param_decl_listContext param_decl_listContext)
     {
+        //when return type of the function is not void,
+        //the current strategy will generate wrong symbol as if it's part of parameters
+        //eg FUNCTION INT main()
+        //will give    name main type INT
+        //but it doesn't exit
+        //clea the idstack before enter into the paralist can avoid it.
+        idStack.clear();
     }
 
 
@@ -212,15 +219,15 @@ public class myMicroListener extends MicroBaseListener {
 
     @Override
     public void exitFunc_decl(MicroParser.Func_declContext func_declContext) {
-        //dump id in stack, create symbol, and add to symbol list
-        add_symbol_from_idStack("INT");
-
-        //dump all this func level symbols into its list
-        saveBuffertoCurrentScope();
-
         //get properties of functions
         String funcName = func_declContext.id().getText();
         String returnType = func_declContext.any_type().getText();
+
+        //dump id in stack, create symbol, and add to symbol list
+        add_symbol_from_idStack("INT");//hardCoded as INT
+        
+        //dump all this func level symbols into its list
+        saveBuffertoCurrentScope();
 
 
         //change the scope to parent scope when exit a func decl

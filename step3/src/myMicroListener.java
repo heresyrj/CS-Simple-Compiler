@@ -1,7 +1,5 @@
 import symbolTable.*;
-
 import java.util.ArrayList;
-import java.util.Stack;
 
 
 /**
@@ -15,7 +13,7 @@ public class myMicroListener extends MicroBaseListener {
     private Symbol prevSymbol;
     private String currentType;
     private ArrayList<Symbol> symBuffer;
-    private Stack<String> idStack;
+    private ArrayList<String> idStack;
     private int blockcounter;
 
 
@@ -23,7 +21,7 @@ public class myMicroListener extends MicroBaseListener {
     {
         this.wrapperScope = wrapperScope;
         symBuffer = new ArrayList<>();
-        idStack = new Stack<>();
+        idStack = new ArrayList<>();
         blockcounter = 1;
     }
 
@@ -143,7 +141,7 @@ public class myMicroListener extends MicroBaseListener {
         {
             //get single id
             //MicroParser.IdContext id = id_list.getChild(id_list.id().getClass(), index);
-            String name = idStack.pop();
+            String name = idStack.remove(0);
 
             //create symbol with found type and push to stack
             switch (type) {
@@ -197,13 +195,13 @@ public class myMicroListener extends MicroBaseListener {
                 wrapperScope.getSymbol(0).sym_setName(id);
                 break;
             case "FUNCTION":
-                idStack.push(id);
+                idStack.add(id);
                 break;
             case "INT":
-                idStack.push(id);
+                idStack.add(id);
                 break;
             case "FLOAT":
-                idStack.push(id);
+                idStack.add(id);
                 break;
             case "STRING":
                 break;

@@ -45,25 +45,25 @@ public class Scope {
 
             if (type.equals("PROGRAM")) {
                 //part1
-                System.out.print("Symbol table Global\n");
+                System.out.print("Symbol table GLOBAL\n");
                 //part2
                 programSymbol ps = (programSymbol) s;
                 //
                 ps.getOwnScope().printSymbols();
 
             } else if (type.equals("FUNCTION")) {
-                System.out.println("\n");
+                System.out.println();
                 //part1
-                System.out.print("Symbol table " + name);
+                System.out.print("Symbol table " + name + "\n");
                 //part2
                 funcSymbol fs = (funcSymbol) s;
-                fs.sym_getParentScope().printSymbols();
-                //part3
-                System.out.println();//add one empty line
+                fs.getOwnScope().printSymbols();
 
             } else if (type.equals("BLOCK")) {
-                System.out.println("\n");
-                System.out.print("Symbol table BLOCK");
+                System.out.println();
+                System.out.print("Symbol table " + name);
+                blockSymbol bs = (blockSymbol) s;
+                bs.getOwnScope().printSymbols();
 
             } else {
                 System.out.print("name ");
@@ -76,8 +76,13 @@ public class Scope {
                 String value = ((strSymbol) s).sym_getStr();
                 System.out.print("value ");
                 System.out.print(value);
+
             }
             System.out.println();
+
+            //reset the string values to avoid infinite loop
+            type = "";
+            name = "";
         }
 
     }

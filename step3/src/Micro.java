@@ -2,7 +2,7 @@ import java.io.*;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import symbolTable.Scope;
+import symbolTable.*;
 
 
 public class Micro {
@@ -43,7 +43,6 @@ public class Micro {
         //PART E: Start to parse and get tree
         prc = parser.program();//refer to ANTLR4 Book p239
         tree = prc;
-
     }
 
 
@@ -54,11 +53,5 @@ public class Micro {
 
         //print symbol table
         newTest.wrapperScope.printSymbols();
-
-
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
     }
 }

@@ -166,10 +166,17 @@ public class myMicroListener extends MicroBaseListener {
         //eg FUNCTION INT main()
         //will give    name main type INT
         //but it doesn't exit
-        //clea the idstack before enter into the paralist can avoid it.
+        //clear the idstack before enter into the paralist can avoid it.
         idStack.clear();
     }
 
+    @Override
+    public void enterFunc_body(MicroParser.Func_bodyContext func_bodyContext)
+    {
+        //add this method here to make sure symbol in paralist
+        //appear before other structures in the function
+        add_symbol_from_idStack("INT");//hardCoded as INT
+    }
 
     @Override
     public void exitId(MicroParser.IdContext ctx)

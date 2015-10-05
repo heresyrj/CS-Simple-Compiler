@@ -303,6 +303,47 @@ public class myMicroListener extends MicroBaseListener {
 
     }
 
+    @Override
+    public void enterElse_part(MicroParser.Else_partContext else_partContext)
+    {
+        //create a new block symbol
+        Scope current = getCurrentScope();
+        String name = "BLOCK " + blockcounter;
+        blockSymbol bs = new blockSymbol(name, current);
+        symBuffer.add(bs);
+
+        //save symbol got so far into current scope list
+        saveBuffertoCurrentScope();
+
+        //set the parent scope
+        setParentScope(current);
+        //set the current scope is that of the program, the real global scope
+        setCurrentScope(bs.getOwnScope());
+
+        //increment counter
+        blockcounter++;
+
+        //set currentType as IF
+        setCurrentType("ELSE");
+    }
+
+    @Override
+    public void exitElse_part(MicroParser.Else_partContext else_partContext)
+    {
+        //dump all the global level symbols into the list
+        saveBuffertoCurrentScope();
+
+        //change the scope to parent scope when exit a block
+        setCurrentScope(getCurrentScope().getParentScope());
+        //now current is parent
+        //if parent is not null, get its parent
+        if (getCurrentScope() != null) {
+            setParentScope(getCurrentScope().getParentScope());
+        }
+    }
+
+
+
     /**
         FOR statement
      */

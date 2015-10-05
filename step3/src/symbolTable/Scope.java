@@ -70,16 +70,16 @@ public class Scope {
                 System.out.println();
                 //part1
                 System.out.print("Symbol table " + name + "\n");
+                System.out.println();
                 //part2
                 funcSymbol fs = (funcSymbol) s;
                 fs.getOwnScope().printSymbols();
 
             } else if (type.equals("BLOCK")) {
-                System.out.println();
                 System.out.print("Symbol table " + name);
+                System.out.println("\n");
                 blockSymbol bs = (blockSymbol) s;
                 bs.getOwnScope().printSymbols();
-
             } else {
                 System.out.print("name ");
                 System.out.print(name + " ");

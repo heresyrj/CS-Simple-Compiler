@@ -225,7 +225,7 @@ public class myMicroListener extends MicroBaseListener {
 
         //dump id in stack, create symbol, and add to symbol list
         add_symbol_from_idStack("INT");//hardCoded as INT
-        
+
         //dump all this func level symbols into its list
         saveBuffertoCurrentScope();
 

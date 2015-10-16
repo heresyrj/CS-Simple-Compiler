@@ -1,7 +1,6 @@
 /**
  * Created by jianruan on 9/12/15.
  */
-
 import org.antlr.v4.runtime.*;
 
 class MyErrorHandler extends DefaultErrorStrategy {

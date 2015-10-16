@@ -1,5 +1,7 @@
 package symbolTable;
 
+import utils.generalUtils;
+
 import java.util.ArrayList;
 
 /**
@@ -33,6 +35,7 @@ public class Scope {
 
         boolean containSame = false;
 
+        //check for duplicate before add
         for (Symbol sym : symbolList) {
             boolean bool1 = sym.sym_getName().equals(s.sym_getName());
             boolean bool2 = sym.sym_getType().equals(s.sym_getType());
@@ -44,6 +47,10 @@ public class Scope {
             System.exit(9);
         } else {
             symbolList.add(s);
+
+            /**also need to add to hastMap for later use
+             also it's faster*/
+            generalUtils.addSymboltoTable(s.sym_getName(), s);
         }
     }
 
@@ -51,6 +58,7 @@ public class Scope {
         return parent;
     }
 
+    public ArrayList<Symbol> getSymbolList() { return symbolList;}
 
     public void printSymbols() {
 
@@ -76,7 +84,7 @@ public class Scope {
 
             } else if (type.equals("BLOCK")) {
                 System.out.println("\n");
-                System.out.println("Symbol table " + name);
+                System.out.print("Symbol table " + name);
                 blockSymbol bs = (blockSymbol) s;
                 bs.getOwnScope().printSymbols();
             } else {

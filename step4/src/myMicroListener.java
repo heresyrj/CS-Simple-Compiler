@@ -1,14 +1,14 @@
+
 import symbolTable.*;
+
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
 
 
 /**
  * Created by jianruan on 9/20/15.
  */
 public class myMicroListener extends MicroBaseListener {
+
     private Scope wrapperScope;
     private Scope global;
     private Scope currentScope;
@@ -71,6 +71,8 @@ public class myMicroListener extends MicroBaseListener {
     }
 
 
+
+
     /**
      ************************** Program Symbol Handler ************************
      */
@@ -94,6 +96,11 @@ public class myMicroListener extends MicroBaseListener {
     {
         //dump all the global level symbols into the list
         saveBuffertoCurrentScope();
+
+
+        //Last step before exit is to build hashtable for symbols
+//        ArrayList<Symbol> overallSymbolList = global.getSymbolList();
+//        buildSymbolTable(overallSymbolList);
     }
 
     /**
@@ -364,6 +371,7 @@ public class myMicroListener extends MicroBaseListener {
         }
 
     }
+
 
     /**************************************************************************
      ***************************    End of  ***********************************

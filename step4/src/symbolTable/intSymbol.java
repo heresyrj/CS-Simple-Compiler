@@ -12,7 +12,7 @@ public class intSymbol extends Symbol {
     }
 
     public intSymbol(String name, String value, Scope scope) {
-        super("FLOAT", name, scope);
+        super("INT", name, scope);
         this.value = Integer.valueOf(value);
     }
 

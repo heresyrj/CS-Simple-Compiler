@@ -11,13 +11,27 @@ public class myASTbuilder extends MicroBaseListener {
     @Override
     public void exitBase_stmt(MicroParser.Base_stmtContext ctx)
     {
-        ArrayList<String> tokens = getFlatTokenList(ctx);
-        String assignExpr = tokens.toString();
-        assignExpr = assignExpr.replaceAll(",","");
-        assignExpr = assignExpr.substring(1, assignExpr.indexOf(";"));
-        System.out.println(assignExpr);
-        char[] symbols = assignExpr.toCharArray();
+        ArrayList<String> temp = getFlatTokenList(ctx);
+        int size = temp.size()-1;
+        temp.remove(temp.size()-1);
+        String[] tokens = new String[temp.size()];
+        int i = 0;
+        while(!temp.isEmpty()) {
+            tokens[i] = temp.remove(0);
+            i++;
+        }
+        tokens = postOrderConverter.infixToRPN(tokens);
+        printTokens(tokens);
 
+    }
+
+    public void printTokens(String[] tokens) {
+        int i=0;
+        while(i < tokens.length) {
+            System.out.print(tokens[i]+ " ");
+            i++;
+        }
+        System.out.println();
     }
 
     public ArrayList<String> getFlatTokenList(ParseTree tree) {
@@ -45,7 +59,5 @@ public class myASTbuilder extends MicroBaseListener {
             }
         }
     }
-
-
 
 }

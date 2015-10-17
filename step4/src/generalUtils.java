@@ -13,7 +13,8 @@ public class generalUtils {
     static int labelCounter = 0;
     static ArrayList<String> varNameSpace = new ArrayList<>();
     static ArrayList<String> codeLabelSpace = new ArrayList<>();
-    static Stack<ASTnode> nodeStack = new Stack<>();
+    static Stack<String> exprStack = new Stack<>();
+
 
 
     public static void addSymboltoTable(String varName,Symbol symbol)
@@ -30,35 +31,6 @@ public class generalUtils {
     {
         return SymbolTable.get(varName).sym_getType();
     }
-
-    /*
-    public static boolean checkTypesConsistent(ASTnode left, ASTnode right)
-    {
-        boolean bool1 = left.getType().equals("VAR");
-        boolean bool2 = right.getType().equals("VAR");
-
-        if (bool1&&bool2)
-        {
-            return getVarType(left.getValue()).equals(getVarType(right.getValue()));
-
-        } else if (bool1&&(!bool2)) {
-
-
-        }  else if ((!bool1)&&(!bool2)){
-
-        } else    {
-
-        }
-
-
-        boolean bool312 = left.getValue().contains(".");
-        boolean bool2312= right.getValue().contains(".");
-        boolean A = bool1&&bool2; //both float
-        boolean B = (!bool1) && (!bool2); //both int
-        //true if they are all int or all float
-        return A || B;
-    }
-    */
 
 
     /**Global namespaces*/
@@ -77,12 +49,10 @@ public class generalUtils {
     }
 
     /**Code generation utils*/
-    public static String concatSimpleCode(String left, String middle, String right)
-    {
-        return left + " " + middle + " " + right;
+    public static void convertExpr2Stack(char[] symbols) {
+
+
     }
-
-
 
 
 }

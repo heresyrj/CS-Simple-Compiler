@@ -10,9 +10,7 @@ options {
 }
 
 @header {
-    import symbolTable.*;
-    import AST.*;
-    import utils.*;
+    import src.*;
 }
 
 @member {
@@ -63,7 +61,6 @@ return_stmt       : 'RETURN' expr ';' ;
 /* Expressions */
 expr
                   : expr_prefix factor
-
                   ;
 expr_prefix       : expr_prefix factor addop | ;
 factor            : factor_prefix postfix_expr ;
@@ -72,22 +69,12 @@ postfix_expr      : primary | call_expr ;
 call_expr         : id '(' expr_list ')' ;
 expr_list         : expr expr_list_tail | ;
 expr_list_tail    : ',' expr expr_list_tail | ;
-primary           returns [exprASTnode node]
-                  : '(' expr ')'
+primary           : '(' expr ')'
                   | id
-                  {
-
-                  }
                   | INTLITERAL
-                  {
-                    $INTLITERAL.text
-                  }
                   | FLOATLITERAL
-                  {
-                  }
                   ;
-addop
-                  : '+'
+addop             : '+'
                   | '-'
                   ;
 mulop

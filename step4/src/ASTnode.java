@@ -9,12 +9,7 @@ public abstract class ASTnode {
     protected String result;
 
     public ASTnode(String type, String value) {
-        /*if (Pattern.matches("[a-zA-Z]+",value))
-        {
-            if(generalUtils.checkExist(value)) {
-                System.out.println("undeclared symbol");
-            }
-        }*/
+
         this.type = type;
         this.value = value;
         code = null;

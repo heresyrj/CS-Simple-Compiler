@@ -8,7 +8,7 @@ public class simpleNode extends ASTnode {
       */
     public simpleNode (String type, String value)
     {
-        //store "VAR" or "VALUE"
+        //store "VAR" or "INT" or "FLOAT"
         super(type, value);
     }
 
@@ -16,7 +16,7 @@ public class simpleNode extends ASTnode {
     public void CodeAndResult() {
         //For simple Node the code is it self
         code = getValue();
-        if(getType().equals("VALUE"))
+        if(getType().equals("INT") || getType().equals("FLOAT"))
             result = getValue();
         else
             result = null;

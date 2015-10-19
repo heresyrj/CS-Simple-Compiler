@@ -97,6 +97,10 @@ public class mySTbuilder extends MicroBaseListener {
 
         //print IR
         generalUtils.printIR();
+
+        generalUtils.buidIRNode();
+        generalUtils.generateTinyAssembly();
+        generalUtils.traverse();
     }
 
     /**

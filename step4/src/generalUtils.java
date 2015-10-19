@@ -9,7 +9,7 @@ import java.util.Stack;
 public class generalUtils {
     private static HashMap<String, Symbol> SymbolTable = new HashMap<>();
 
-    static int varCounter = 1;
+    static int varCounter = 0;
     static int labelCounter = 1;
     static Stack<String> varNameSpace = new Stack<>();
     static Stack<String> codeLabelSpace = new Stack<>();
@@ -144,6 +144,317 @@ public class generalUtils {
             i++;
         }
         System.out.println(";tiny code");
+    }
+
+    static ArrayList<IRNode> nodeListIR = new ArrayList<>();
+    public static void buidIRNode() {
+        for(int i = 0; i < codeAggregete.size(); i++) {
+            String line = codeAggregete.get(i);
+            String[] splitline = line.split(" ");
+            IRNode newnode = new IRNode();
+            int len = splitline[0].length();
+            newnode.opCode = splitline[0].substring(1, len);
+            if(splitline[0].contains("STORE")) {
+                newnode.operand1 = splitline[1];
+                newnode.result = splitline[2];
+            }  
+            else if(splitline[0].contains("WRITE")) { 
+                newnode.result = splitline[1];
+            } 
+            else {
+                newnode.operand1 = splitline[1];
+                newnode.operand2 = splitline[2];
+                newnode.result = splitline[3];
+            }
+            nodeListIR.add(newnode);
+        }
+    }
+
+    static ArrayList<tinyNode> nodeListTiny = new ArrayList<>();
+    public static void generateTinyAssembly() {
+
+        for(String varname: SymbolTable.keySet()) {
+            if(!(varname.equals("temp"))) {
+                tinyNode newnode = new tinyNode();
+                newnode.opCode = "var";
+                newnode.operand1 = varname;
+                newnode.operand2 = "";
+
+                nodeListTiny.add(newnode);
+            }
+            
+        }
+
+
+        for(int i = 0; i < nodeListIR.size(); i++) {
+            tinyNode newnode = new tinyNode();
+            IRNode node = nodeListIR.get(i);
+            if(node.opCode.equals("STOREI") || node.opCode.equals("STOREF")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+            }
+            else if(node.opCode.equals("WRITEI")) {
+                newnode.opCode = "sys";
+                newnode.operand1 = "writei";
+                newnode.operand2 = node.result;
+                nodeListTiny.add(newnode);
+            }
+            else if(node.opCode.equals("WRITEF")) {
+                newnode.opCode = "sys";
+                newnode.operand1 = "writer";
+                newnode.operand2 = node.result;
+                nodeListTiny.add(newnode);
+            }
+            else if(node.opCode.equals("ADDI")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "addi";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("ADDF")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "addr";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("SUBI")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "subi";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("SUBF")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "subr";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("MULTI")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "muli";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("MULTF")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "mulr";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("DIVI")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "divi";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+
+            else if(node.opCode.equals("DIVF")) {
+                newnode.opCode = "move";
+                if(node.operand1.startsWith("$T")) {
+                    newnode.operand1 = String.format("r%s", node.operand1.substring(2));
+                } else {
+                    newnode.operand1 = node.operand1;
+                }
+                if(node.result.startsWith("$T")) {
+                    newnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    newnode.operand2 = node.result;
+                }
+                nodeListTiny.add(newnode);
+
+                tinyNode tempnode = new tinyNode();
+                tempnode.opCode = "divr";
+                if(node.operand2.startsWith("$T")) {
+                    tempnode.operand1 = String.format("r%s", node.operand2.substring(2));
+                } else {
+                    tempnode.operand1 = node.operand2;
+                }
+                if(node.result.startsWith("$T")) {
+                    tempnode.operand2 = String.format("r%s", node.result.substring(2));
+                } else {
+                    tempnode.operand2 = node.result;
+                }
+                nodeListTiny.add(tempnode);
+            }
+        }
+    }
+
+    public static void traverse() {
+        for(int i = 0; i < nodeListTiny.size(); i++) {
+            System.out.println(nodeListTiny.get(i).opCode + " " + nodeListTiny.get(i).operand1 + " " + nodeListTiny.get(i).operand2);
+        }
+        System.out.println("sys halt");
+
     }
 
 }

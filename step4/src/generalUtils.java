@@ -9,10 +9,11 @@ import java.util.Stack;
 public class generalUtils {
     private static HashMap<String, Symbol> SymbolTable = new HashMap<>();
 
-    static int varCounter = 0;
-    static int labelCounter = 0;
-    static ArrayList<String> varNameSpace = new ArrayList<>();
-    static ArrayList<String> codeLabelSpace = new ArrayList<>();
+    static int varCounter = 1;
+    static int labelCounter = 1;
+    static Stack<String> varNameSpace = new Stack<>();
+    static Stack<String> codeLabelSpace = new Stack<>();
+    static ArrayList<String> codeAggregete = new ArrayList<>();
 
 
     public static void addSymboltoTable(String varName,Symbol symbol)
@@ -38,7 +39,9 @@ public class generalUtils {
         else if (isInteger(s)) return "INT";
         else if (isFloat(s)) return "FLOAT";
         else {
-            if (checkExist(s)) return "VAR";
+            if (checkExist(s)) {
+                return getVarType(s)+"VAR";
+            }
             else return "ERR";
         }
     }
@@ -70,16 +73,25 @@ public class generalUtils {
     /**Global namespaces*/
     public static String generateVarName() {
 
-        String name = "var" + varCounter;
-        varNameSpace.add(name);
+        String name = "$T" + varCounter++;
+        varNameSpace.push(name);
         return name;
+    }
+    public static String getRecentVarName() {
+        return varNameSpace.pop();
     }
 
     public static String generateCodeLabel() {
 
         String name = "label" + labelCounter;
-        codeLabelSpace.add(name);
+        codeLabelSpace.push(name);
         return name;
+    }
+    public static String getRecentCodeLabel() {
+        return codeLabelSpace.pop();
+    }
+    public static void storeCode(String code) {
+        codeAggregete.add(code);
     }
 
     /**Code generation utils
@@ -93,11 +105,9 @@ public class generalUtils {
         {
             String current = expr.remove(0);
             String type = varORvalue(current);
-            if(type.equals("VAR")) {
-                if(checkExist(current)) {
-                    simpleNode node = new simpleNode("VAR",current);
-                    builderStack.push(node);
-                }
+            if(type.contains("VAR")) {
+                simpleNode node = new simpleNode(type,current);
+                builderStack.push(node);
             } else if (type.equals("INT")) {
                 simpleNode node = new simpleNode("INT",current);
                 builderStack.push(node);

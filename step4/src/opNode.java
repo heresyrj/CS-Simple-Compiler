@@ -11,314 +11,103 @@ public class opNode extends ASTnode {
         super("OP", opcode);
         leftNode = left;
         rightNode =right;
+        CodeAndResult();
     }
 
     public String getOpcode () {return getValue();}
-    public String getResult () {return result;}
+    public String getTemp () {return temp;}
 
     public void CodeAndResult()
     {
+        String op = getOpcode();
+        switch (op) {
+            case ":=":
+                code = ";STOREI " + rightNode.temp +" "+ leftNode.temp;
+                break;
+            case "+":
+                code = arithmCodeGen("+");
+                break;
+            case "-":
+                code = arithmCodeGen("-");
+                break;
+            case "*":
+                code = arithmCodeGen("*");
+                break;
+            case "/":
+                code = arithmCodeGen("/");
+                break;
+            default:
+                System.out.println("non-exit opcode");
+                break;
+        }
+        System.out.println(code);
+        generalUtils.storeCode(code);
+    }
 
-        String thisOperation = getValue();
+    public String arithmCodeGen(String op) {
+        temp = generalUtils.generateVarName();
+        code = ";"+determineOperator(op) + " "+ leftNode.temp + " " +rightNode.temp + " " + temp;
+        return code;
+    }
+    public String getDataType(ASTnode node) {
+        if (node.getType().equals("OP")) {
+            opNode opnode = (opNode)node;
+            return getDataType(opnode.rightNode);
+        } else {
+            return node.getType();
+        }
+    }
+    public String determineOperator(String op) {
+        String type_left = getDataType(leftNode);
+        String type_right = getDataType(rightNode);
+        String longer;
+        String shorter;
+        if (type_left.length() >= type_right.length()) {
+            longer = type_left;
+            shorter = type_right;
+        }
+        else {
+            longer = type_right;
+            shorter = type_left;
+        }
 
-        //case 1: simplest code form
-        boolean bool1 = leftNode.getType().equals("INT");
-        boolean bool2 = rightNode.getType().equals("INT");
-        boolean bool3 = leftNode.getType().equals("FLOAT");
-        boolean bool4 = rightNode.getType().equals("FLOAT");
-        boolean bool5 = leftNode.getType().equals("VAR");
-        boolean bool6 = rightNode.getType().equals("VAR");
 
-        if (bool1 && bool2) //two number
+        String type = null;
+        if(longer.contains(shorter))
         {
-            if(thisOperation.equals("+")) {
-                code = "ADDI";
-            }
-
-            if(thisOperation.equals("-")) {
-                code = "SUBI";
-            }
-
-            if(thisOperation.equals("*")) {
-                code = "MULTI";
-            }
-
-            if(thisOperation.equals("/")) {
-                code = "DIVI";
-            }
-            /*if(leftValue.contains("."))//left is a float
-            {
-                if(rightValue.contains("."))
-                {
-                    float rel = Float.parseFloat(leftValue) * Float.parseFloat(rightValue);
-                    result = Float.toString(rel);
-                }
-            } else {//left is an int
-                if(!rightValue.contains("."))
-                {
-                    int rel = Integer.parseInt(leftValue) * Integer.parseInt(rightValue);
-                    result = Integer.toString(rel);
-                }
-            }
-            //since it's just a number
-            code = result;*/
-        }
-        else if (bool3 && bool4) //two variables
-        {
-            if(thisOperation.equals("+")) {
-                code = "ADDF";
-            }
-
-            if(thisOperation.equals("-")) {
-                code = "SUBF";
-            }
-
-            if(thisOperation.equals("*")) {
-                code = "MULTF";
-            }
-
-            if(thisOperation.equals("/")) {
-                code = "DIVF";
-            }
-        }
-        else if((bool1&&bool4) || (bool2&&bool3))
-        {
-            if(thisOperation.equals("+")) {
-                code = "ADDF";
-            }
-
-            if(thisOperation.equals("-")) {
-                code = "SUBF";
-            }
-
-            if(thisOperation.equals("*")) {
-                code = "MULTF";
-            }
-
-            if(thisOperation.equals("/")) {
-                code = "DIVF";
-            }
-        }
-        else if(bool5&&bool6) {
-            String leftValue = leftNode.getValue();
-            String rightValue = rightNode.getValue();
-
-            String lefttype = getVarType(leftValue);
-            String righttype = getVarType(righttValue);
-
-            if(lefttype.equals("INT") && righttype.equals("INT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDI";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBI";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTI";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVI";
-                }        
-            }
-
-            if(lefttype.equals("FLOAT") && righttype.equals("FLOAT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }        
-            }
-
-            if((lefttype.equals("FLOAT") && righttype.equals("INT")) || (lefttype.equals("INT") && righttype.equals("FLOAT"))) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }        
-            }   
+            if(type_left.contains("INT")) type = "INT";
+            if(type_left.contains("FLOAT")) type = "FLOAT";
+        } else {
+            System.out.println("inconsistent types in math operation.");
         }
 
-        else if(bool1&&bool6) {
-            String rightValue = rightNode.getValue();
-            String righttype = getVarType(righttValue);
-
-            if(righttype.equals("INT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDI";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBI";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTI";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVI";
-                }
-            }
-            else if(righttype.equals("FLOAT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
-        }
-        else if(bool3&&bool6) {
-            String rightValue = rightNode.getValue();
-            String righttype = getVarType(righttValue);
-
-            if(righttype.equals("INT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
-            else if(righttype.equals("FLOAT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
+        String operator = null;
+        switch (op) {
+            case "+":
+                assert type != null;
+                if(type.equals("INT")) operator = "ADDI";
+                if(type.equals("FLOAT")) operator = "ADDF";
+                break;
+            case "-":
+                assert type != null;
+                if(type.equals("INT")) operator = "SUBI";
+                if(type.equals("FLOAT")) operator = "SUBF";
+                break;
+            case "*":
+                assert type != null;
+                if(type.equals("INT")) operator = "MULTI";
+                if(type.equals("FLOAT")) operator = "MULTF";
+                break;
+            case "/":
+                assert type != null;
+                if(type.equals("INT")) operator = "DIVI";
+                if(type.equals("FLOAT")) operator = "DIVF";
+                break;
+            default:
+                System.out.println("invalid operator occur in building AST node");
         }
 
-        else if(bool5&&bool2) {
-            String leftValue = leftNode.getValue();
-            String lefttype = getVarType(righttValue);
-
-            if(lefttype.equals("INT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDI";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBI";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTI";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVI";
-                }
-            }
-            else if(lefttype.equals("FLOAT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
-        }
-
-        else if(bool5&&bool4) {
-            String leftValue = leftNode.getValue();
-            String lefttype = getVarType(righttValue);
-
-            if(lefttype.equals("INT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
-            else if(lefttype.equals("FLOAT")) {
-                if(thisOperation.equals("+")) {
-                code = "ADDF";
-                }
-
-                if(thisOperation.equals("-")) {
-                    code = "SUBF";
-                }
-
-                if(thisOperation.equals("*")) {
-                    code = "MULTF";
-                }
-
-                if(thisOperation.equals("/")) {
-                    code = "DIVF";
-                }
-            }
-        }
+        return operator;
     }
 
 

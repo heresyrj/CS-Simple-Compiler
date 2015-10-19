@@ -10,15 +10,24 @@ public class simpleNode extends ASTnode {
     {
         //store "VAR" or "INT" or "FLOAT"
         super(type, value);
+        CodeAndResult();
     }
 
     @Override
     public void CodeAndResult() {
         //For simple Node the code is it self
-        code = getValue();
-        if(getType().equals("INT") || getType().equals("FLOAT"))
-            result = getValue();
-        else
-            result = null;
+        if(getType().equals("INT") || getType().equals("FLOAT")) {
+            temp = generalUtils.generateVarName();
+            code = ";STOREI " +  getValue() +" "+ temp;
+            System.out.println(code);
+            generalUtils.storeCode(code);
+        }
+        else {
+            //unnecessary to generate Temp for var
+            //the code will be depending on the nearest operator
+            temp = getValue();
+            code = null;
+        }
+
     }
 }

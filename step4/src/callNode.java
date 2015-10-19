@@ -9,10 +9,13 @@ public class callNode extends ASTnode {
     public callNode(String call, ASTnode node) {
         super("CALL", call);
         arguement = node;
+        CodeAndResult();
     }
-
+    public String getCall() {return getValue();}
     @Override
     public void CodeAndResult() {
-
+        code = ";" + getCall() + " " + arguement.temp;
+        System.out.println(code);
+        generalUtils.storeCode(code);
     }
 }

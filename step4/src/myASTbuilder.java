@@ -30,11 +30,11 @@ public class myASTbuilder extends MicroBaseListener {
         ArrayList<String> s = new ArrayList<>();
         int i=0;
         while(i < tokens.length) {
-            System.out.print(tokens[i]+ " ");
+            //System.out.print(tokens[i]+ " ");
             s.add(tokens[i]);
             i++;
         }
-        System.out.println();
+        //System.out.println();
         return s;
     }
 

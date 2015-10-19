@@ -95,10 +95,8 @@ public class mySTbuilder extends MicroBaseListener {
         //dump all the global level symbols into the list
         saveBuffertoCurrentScope();
 
-
-        //Last step before exit is to build hashtable for symbols
-//        ArrayList<Symbol> overallSymbolList = global.getSymbolList();
-//        buildSymbolTable(overallSymbolList);
+        //print IR
+        generalUtils.printIR();
     }
 
     /**

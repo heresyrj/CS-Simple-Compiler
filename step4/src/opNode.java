@@ -16,13 +16,14 @@ public class opNode extends ASTnode {
 
     public String getOpcode () {return getValue();}
     public String getTemp () {return temp;}
+    public ASTnode getAnode() {return rightNode;}
 
     public void CodeAndResult()
     {
         String op = getOpcode();
         switch (op) {
             case ":=":
-                code = ";STOREI " + rightNode.temp +" "+ leftNode.temp;
+                code = ";"+determineOperator(op) + " "+ rightNode.temp +" "+ leftNode.temp;
                 break;
             case "+":
                 code = arithmCodeGen("+");
@@ -40,13 +41,13 @@ public class opNode extends ASTnode {
                 System.out.println("non-exit opcode");
                 break;
         }
-        System.out.println(code);
+        //System.out.println(code);
         generalUtils.storeCode(code);
     }
 
     public String arithmCodeGen(String op) {
         temp = generalUtils.generateVarName();
-        code = ";"+determineOperator(op) + " "+ leftNode.temp + " " +rightNode.temp + " " + temp;
+        code = ";"+determineOperator(op) + " " + leftNode.temp + " " +rightNode.temp + " " + temp;
         return code;
     }
     public String getDataType(ASTnode node) {
@@ -58,6 +59,7 @@ public class opNode extends ASTnode {
         }
     }
     public String determineOperator(String op) {
+
         String type_left = getDataType(leftNode);
         String type_right = getDataType(rightNode);
         String longer;
@@ -82,7 +84,13 @@ public class opNode extends ASTnode {
         }
 
         String operator = null;
+
         switch (op) {
+            case ":=":
+                assert type != null;
+                if(type.equals("INT")) operator = "STOREI";
+                if(type.equals("FLOAT")) operator = "STOREF";
+                break;
             case "+":
                 assert type != null;
                 if(type.equals("INT")) operator = "ADDI";

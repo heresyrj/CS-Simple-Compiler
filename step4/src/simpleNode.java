@@ -18,8 +18,13 @@ public class simpleNode extends ASTnode {
         //For simple Node the code is it self
         if(getType().equals("INT") || getType().equals("FLOAT")) {
             temp = generalUtils.generateVarName();
-            code = ";STOREI " +  getValue() +" "+ temp;
-            System.out.println(code);
+            if(getType().equals("INT")) {
+                code = ";STOREI ";
+            } else {
+                code = ";STOREF ";
+            }
+            code =  code + getValue() +" "+ temp;
+            //System.out.println(code);
             generalUtils.storeCode(code);
         }
         else {
@@ -28,6 +33,6 @@ public class simpleNode extends ASTnode {
             temp = getValue();
             code = null;
         }
-
     }
+
 }

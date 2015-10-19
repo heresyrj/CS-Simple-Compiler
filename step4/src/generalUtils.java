@@ -135,4 +135,15 @@ public class generalUtils {
 
     }
 
+    public static void printIR() {
+        System.out.println(";IR code");
+        int size = codeAggregete.size();
+        int i = 0;
+        while(i < size) {
+            System.out.println(codeAggregete.get(i));
+            i++;
+        }
+        System.out.println(";tiny code");
+    }
+
 }

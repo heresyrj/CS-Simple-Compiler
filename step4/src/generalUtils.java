@@ -93,8 +93,9 @@ public class generalUtils {
         codeAggregete.add(code);
     }
 
-    /**Code generation utils
-     * This is the main function to create AST and Code
+
+    /***********************************************************************
+     * AST tree generation
      * */
     static Stack<ASTnode> builderStack = new Stack<>();
     static ArrayList<ASTnode> execQueue = new ArrayList<>();//stores all the statement AST
@@ -134,7 +135,7 @@ public class generalUtils {
 
     }
 
-    /**
+    /*****************************************************************************
      * IRnode Generation
      * */
     private static class IRNode {
@@ -165,7 +166,7 @@ public class generalUtils {
         }
     }
 
-    /**
+    /***********************************************************************
      * TinyNode Generation
      * */
     private static class tinyNode {

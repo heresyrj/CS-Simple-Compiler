@@ -68,9 +68,6 @@ public class mySTbuilder extends MicroBaseListener {
         }
     }
 
-
-
-
     /**
      ************************** Program Symbol Handler ************************
      */
@@ -96,11 +93,7 @@ public class mySTbuilder extends MicroBaseListener {
         saveBuffertoCurrentScope();
 
         //print IR
-        generalUtils.printIR();
-
-        generalUtils.buidIRNode();
-        generalUtils.generateTinyAssembly();
-        generalUtils.traverse();
+        generalUtils.compile();
     }
 
     /**

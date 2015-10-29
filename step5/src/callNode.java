@@ -1,30 +1,38 @@
+import java.util.ArrayList;
+
 /**
  * Created by jianruan on 10/15/15.
  */
 public class callNode extends ASTnode {
 
-    private ASTnode arguement;
+    private ArrayList<ASTnode> arguments;
     String result;
 
-    public callNode(String call, ASTnode node) {
+    public callNode(String call, ArrayList<ASTnode> arguments) {
         super("CALL", call);
-        arguement = node;
+        this.arguments = arguments;
         CodeAndResult();
     }
     public String getCall() {return getValue();}
     @Override
     public void CodeAndResult() {
 
-        code = ";" + determineOperator() + " " + arguement.temp;
+        String part1 = ";" + determineOperator();
+        while(!arguments.isEmpty())
+        {
+            code = part1 + " " + arguments.remove(arguments.size()-1).temp;
+            generalUtils.storeCode(code);
+        }
         //System.out.println(code);
-        generalUtils.storeCode(code);
+
     }
 
     public String determineOperator() {
         String call = getCall();
-        String type = getDataType(arguement);
+        String type = getDataType(arguments.get(0));
         if (type.contains("INT")) return call+"I";
-        else return call+"F";
+        else if (type.contains("FLOAT")) return call+"F";
+        else return call+"S";
     }
 
     public String getDataType(ASTnode node) {

@@ -10,9 +10,10 @@ public class generalUtils {
 
     static int varCounter = 1;
     static int labelCounter = 1;
+    static ArrayList<String> codeAggregete = new ArrayList<>();
+
     static Stack<String> varNameSpace = new Stack<>();
     static Stack<String> codeLabelSpace = new Stack<>();
-    static ArrayList<String> codeAggregete = new ArrayList<>();
 
 
     public static void addSymboltoTable(String varName,Symbol symbol)
@@ -20,7 +21,6 @@ public class generalUtils {
         SymbolTable.put(varName, symbol);
     }
 
-    public static void addLineToCodeAggregate (String line) {codeAggregete.add(line);}
 
     /**Validation utils*/
     public static boolean checkExist(String varName)
@@ -85,15 +85,13 @@ public class generalUtils {
         return varNameSpace.pop();
     }
 
-    public static String generateCodeLabel() {
-
-        String name = "label" + labelCounter++;
-        codeLabelSpace.push(name);
-        return name;
-    }
-    public static String getRecentCodeLabel() {
+    public static String generateCodeLabel() { return "label" + labelCounter++; }
+    public static void pushLabel(String label) {codeLabelSpace.push(label);}
+    public static String popLabel() {
         return codeLabelSpace.pop();
     }
+    public static String peekLabel() {return  codeLabelSpace.peek();}
+
     public static void storeCode(String code) {
         codeAggregete.add(code);
     }
@@ -102,8 +100,6 @@ public class generalUtils {
     /***********************************************************************
      * AST tree generation
      * */
-    private static String label4cmp;//this will be updated everytime for or ifelse occurs
-    public static void setlabel4Cmp(String label) { label4cmp = label;}
     static Stack<ASTnode> builderStack = new Stack<>();
     static ArrayList<ASTnode> execQueue = new ArrayList<>();//stores all the statement AST
     public static void ASTgenerator(ArrayList<String> expr) {
@@ -133,19 +129,30 @@ public class generalUtils {
             } else if (type.equals("CMP")) {
                 ASTnode right = builderStack.pop();
                 ASTnode left = builderStack.pop();
-                cmpNode node = new cmpNode(current, left, right, label4cmp);
+                cmpNode node = new cmpNode(current, left, right, peekLabel());
                 execQueue.add(node);
 
             } else if (type.equals("WRITE")){
-                ASTnode argument = builderStack.pop();
-                ASTnode node = new callNode("WRITE", argument);
+
+                ArrayList<ASTnode> arguments = new ArrayList<>();
+                while(!builderStack.isEmpty())
+                {
+                    arguments.add(builderStack.pop());
+                }
+                //ASTnode argument = builderStack.pop();
+                ASTnode node = new callNode("WRITE", arguments);
                 execQueue.add(node);
             } else if (type.equals("READ")){
                 //step1: create ASTnode for the var that will hold value that "READ" get
                 ASTgenerator(expr);
-                //step2: create "READ" ASTnode
-                ASTnode argument = builderStack.pop();
-                ASTnode node = new callNode("READ", argument);
+                //step2: create arguments list
+                ArrayList<ASTnode> arguments = new ArrayList<>();
+                while(!builderStack.isEmpty())
+                {
+                    arguments.add(builderStack.pop());
+                }
+                //step3: create "READ" ASTnode;
+                ASTnode node = new callNode("READ", arguments);
                 execQueue.add(node);
             } else {
                 System.out.println("ERR: unrecognizable symbol \""+type+ "\" in expr");

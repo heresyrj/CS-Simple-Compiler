@@ -35,7 +35,14 @@ public class IRtoRawASM {
                 newnode.result = splitline[2];
             } else if (splitline[0].contains("WRITE")) {
                 newnode.result = splitline[1];
-            } else {
+            } else if (splitline[0].contains("LABEL")) {
+                newnode.result = splitline[1];
+            } else if (splitline[0].contains("JUMP")) {
+                newnode.result = splitline[1];
+            } else if (splitline[0].contains("READ")) {
+                newnode.result = splitline[1];
+            }
+            else {
                 newnode.operand1 = splitline[1];
                 newnode.operand2 = splitline[2];
                 newnode.result = splitline[3];
@@ -58,7 +65,11 @@ public class IRtoRawASM {
     public void generateTinyAssembly() {
 
         for (String varname : SymbolTable.keySet()) {
-            if (!(varname.equals("temp"))) {
+
+            Symbol s = SymbolTable.get(varname);
+            Scope scope = s.sym_getParentScope();
+
+            if (!(varname.equals("temp")) && (scope.getName().equals("GLOBAL"))) {
                 tinyNode newnode = new tinyNode();
                 newnode.opCode = "var";
                 newnode.operand1 = varname;
@@ -329,6 +340,253 @@ public class IRtoRawASM {
                     }
                     nodeListTiny.add(tempnode);
                     break;
+                }
+                case "LABEL": {
+                    newnode.opCode = "label";
+                    newnode.operand1 = aNodeListIR.result;
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+                    break;
+                }
+                case "JUMP": {
+                    newnode.opCode = "jmp";
+                    newnode.operand1 = aNodeListIR.result;
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+                    break;
+                }
+                case "NE": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+      
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jne";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "LE": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jle";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "GE": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+                
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jge";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "GT": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jgt";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "LT": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jlt";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "EQ": {
+                    String type1 = null;
+                    String type2 = null;
+                    if(aNodeListIR.operand1.startsWith("$T")) {
+                        type1 = null;
+                    } else {
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
+                    }
+
+                    if(aNodeListIR.operand2.startsWith("$T")) {
+                        type2 = null;
+                    } else {
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
+                    }
+                    if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
+                        newnode.opCode = "cmpi";
+                    } else {
+                        newnode.opCode = "cmpr";
+                    }
+                    if (aNodeListIR.operand1.startsWith("$T")) {
+                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else {
+                        newnode.operand1 = aNodeListIR.operand1;
+                    }
+                    if (aNodeListIR.operand2.startsWith("$T")) {
+                        newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    } else {
+                        newnode.operand2 = aNodeListIR.operand2;
+                    }
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "jeq";
+                    tempnode.operand1 = aNodeListIR.result;
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                }
+                case "READI": {
+                    newnode.opCode = "sys";
+                    newnode.operand1 = "readi";
+                    newnode.operand2 = aNodeListIR.result;
+                }
+                case "READF": {
+                    newnode.opCode = "sys";
+                    newnode.operand1 = "readr";
+                    newnode.operand2 = aNodeListIR.result;
                 }
             }
         }

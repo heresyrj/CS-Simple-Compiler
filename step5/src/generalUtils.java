@@ -164,12 +164,16 @@ public class generalUtils {
 
     public static void compile() {
 
+        IRtoRawASM converter = new IRtoRawASM(codeAggregete);
+
         System.out.println(";IR code");
         for(String line : codeAggregete) {
             System.out.println(line);
         }
 
         System.out.println(";tiny code");
+
+        converter.printTiny();
 
     }
 

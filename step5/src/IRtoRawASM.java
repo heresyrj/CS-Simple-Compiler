@@ -109,6 +109,12 @@ public class IRtoRawASM {
                     newnode.operand2 = aNodeListIR.result;
                     nodeListTiny.add(newnode);
                     break;
+                case "WRITES":
+                    newnode.opCode = "sys";
+                    newnode.operand1 = "writes";
+                    newnode.operand2 = aNodeListIR.result;
+                    nodeListTiny.add(newnode);
+                    break;
                 case "ADDI": {
                     newnode.opCode = "move";
                     if (aNodeListIR.operand1.startsWith("$T")) {
@@ -588,12 +594,14 @@ public class IRtoRawASM {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readi";
                     newnode.operand2 = aNodeListIR.result;
+                    nodeListTiny.add(newnode);
                     break;
                 }
                 case "READF": {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readr";
                     newnode.operand2 = aNodeListIR.result;
+                    nodeListTiny.add(newnode);
                     break;
                 }
             }

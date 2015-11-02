@@ -17,19 +17,22 @@ public class callNode extends ASTnode {
     @Override
     public void CodeAndResult() {
 
-        String part1 = ";" + determineOperator();
+
         while(!arguments.isEmpty())
         {
-            code = part1 + " " + arguments.remove(arguments.size()-1).temp;
+            ASTnode currentNode = arguments.remove(arguments.size()-1);
+            String currentValue = currentNode.temp;
+            String part1 = ";" + determineOperator(currentNode);
+            code = part1 + " " + currentValue;
             generalUtils.storeCode(code);
         }
         //System.out.println(code);
 
     }
 
-    public String determineOperator() {
+    public String determineOperator(ASTnode current) {
         String call = getCall();
-        String type = getDataType(arguments.get(0));
+        String type = getDataType(current);
         if (type.contains("INT")) return call+"I";
         else if (type.contains("FLOAT")) return call+"F";
         else return call+"S";

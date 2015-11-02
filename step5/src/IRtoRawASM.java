@@ -391,6 +391,7 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "LE": {
                     String type1 = null;
@@ -428,6 +429,7 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "GE": {
                     String type1 = null;
@@ -466,6 +468,7 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "GT": {
                     String type1 = null;
@@ -503,6 +506,7 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "LT": {
                     String type1 = null;
@@ -540,6 +544,7 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "EQ": {
                     String type1 = null;
@@ -577,16 +582,19 @@ public class IRtoRawASM {
                     tempnode.operand1 = aNodeListIR.result;
                     tempnode.operand2 = "";
                     nodeListTiny.add(tempnode);
+                    break;
                 }
                 case "READI": {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readi";
                     newnode.operand2 = aNodeListIR.result;
+                    break;
                 }
                 case "READF": {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readr";
                     newnode.operand2 = aNodeListIR.result;
+                    break;
                 }
             }
         }

@@ -21,14 +21,14 @@
 ;JUMP label1
 ;LABEL label3
 ;WRITEF approx
-;WRITEI eol
+;WRITES eol
 ;tiny code
 var i
 var j
 var newapprox
 var approx
 var num
-var eol
+str eol "\n"
 sys readr num
 move 1 r0
 move r0 j
@@ -57,5 +57,5 @@ move r9 i
 jmp label1
 label label3
 sys writer approx
-sys writei eol
+sys writes eol
 sys halt

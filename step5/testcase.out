@@ -53,11 +53,11 @@ var count
 var diff 
 var newapprox 
 var enough 
-var space 
+str space " "
 var approx 
 var num 
 var tolerance 
-var eol 
+str eol "\n"
 move 0.0001 r1
 move r1 tolerance
 sys readr num
@@ -117,7 +117,7 @@ move r101 approx
 jmp label1 
 label label2 
 sys writer approx
-sys writei space
+sys writes space
 sys writei count
-sys writei eol
+sys writes eol
 sys halt

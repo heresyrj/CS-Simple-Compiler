@@ -72,16 +72,23 @@ public class IRtoRawASM {
 
             if (!(varname.equals("temp")) && (scope.getName().equals("GLOBAL"))) {
                 tinyNode newnode = new tinyNode();
-                newnode.opCode = "var";
-                newnode.operand1 = varname;
-                newnode.operand2 = "";
+                if((generalUtils.getVarType(varname)).equals("STRING")) {
+                    strSymbol str = (strSymbol) s;
+                    String value = str.sym_getStr();
+                    newnode.opCode = "str";
+                    newnode.operand1 = varname;
+                    newnode.operand2 = value;
+                } else {
+                    newnode.opCode = "var";
+                    newnode.operand1 = varname;
+                    newnode.operand2 = "";
+                }
 
                 variables.add(varname);
                 nodeListTiny.add(newnode);
             }
         }
 
-        //int counter = 0;
         int reg = 99;
         for (IRNode aNodeListIR : nodeListIR) {
             tinyNode newnode = new tinyNode();

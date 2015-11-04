@@ -1,0 +1,68 @@
+;IR code
+;STOREI 7 $T1
+;STOREI $T1 num
+;STOREI 2 $T2
+;STOREI $T2 i
+;STOREI 42 $T3
+;STOREI $T3 a
+;STOREI 5 $T4
+;GE i $T4 label2
+;ADDI num a $T5
+;STOREI $T5 num
+;STOREI 3 $T6
+;GE i $T6 label4
+;ADDI num a $T7
+;STOREI $T7 num
+;JUMP label3
+;LABEL label4
+;LABEL label3
+;JUMP label1
+;LABEL label2
+;STOREI 5 $T8
+;LT i $T8 label6
+;SUBI num a $T9
+;STOREI $T9 num
+;JUMP label5
+;LABEL label6
+;LABEL label5
+;LABEL label1
+;WRITEI num
+;tiny code
+var num 
+var a 
+var i 
+move 7 r1
+move r1 num
+move 2 r2
+move r2 i
+move 42 r3
+move r3 a
+move 5 r4
+cmpi i r4
+jge label2 
+move num r5
+addi a r5
+move r5 num
+move 3 r6
+cmpi i r6
+jge label4 
+move num r7
+addi a r7
+move r7 num
+jmp label3 
+label label4 
+label label3 
+jmp label1 
+label label2 
+move 5 r8
+cmpi i r8
+jlt label6 
+move num r9
+subi a r9
+move r9 num
+jmp label5 
+label label6 
+label label5 
+label label1 
+sys writei num
+sys halt

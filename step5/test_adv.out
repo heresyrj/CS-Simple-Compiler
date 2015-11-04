@@ -91,8 +91,8 @@ move r12 diff
 move 0.0 r13
 cmpr diff r13
 jle label4 
-move diff r100
-cmpr tolerance r100
+move tolerance r100
+cmpr diff r100
 jge label6 
 move 1 r14
 move r14 enough

@@ -407,11 +407,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
@@ -459,11 +459,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
@@ -511,11 +511,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
@@ -562,11 +562,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
@@ -613,11 +613,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
@@ -664,11 +664,11 @@ public class IRtoRawASM {
                     if(variables.contains(aNodeListIR.operand1) && variables.contains(aNodeListIR.operand2)) {
                         tinyNode tempnode = new tinyNode();
                         tempnode.opCode = "move";
-                        tempnode.operand1 = aNodeListIR.operand1;
+                        tempnode.operand1 = aNodeListIR.operand2;
                         tempnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(tempnode);
 
-                        newnode.operand1 = aNodeListIR.operand2;
+                        newnode.operand1 = aNodeListIR.operand1;
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;

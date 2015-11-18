@@ -177,7 +177,7 @@ public class mySTbuilder extends MicroBaseListener {
         if(paradel != null) {
             MicroParser.Var_typeContext paraVars = paradel.var_type();
             String type = paraVars.getText();
-            add_symbol_from_idStack(type, true);//hardCoded as INT
+            add_symbol_from_idStack(type, true);
         }
     }
 

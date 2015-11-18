@@ -50,7 +50,7 @@ public class opNode extends ASTnode {
     }
 
     public String arithmCodeGen(String op) {
-        temp = generalUtils.generateVarName();
+        temp = generalUtils.generateGlobalName();
         code = ";"+determineOperator(op) + " " + leftNode.temp + " " +rightNode.temp + " " + temp;
         return code;
     }

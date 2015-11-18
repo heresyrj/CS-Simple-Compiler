@@ -6,13 +6,14 @@ import java.util.Stack;
  * Created by jianruan on 10/14/15.
  */
 public class generalUtils {
+
+    protected static HashMap<String, HashMap> directoryLookup = new HashMap<>();
     protected static HashMap<String, Symbol> SymbolTable = new HashMap<>();
 
     static int varCounter = 1;
     static int labelCounter = 1;
     static ArrayList<String> codeAggregete = new ArrayList<>();
 
-    static Stack<String> varNameSpace = new Stack<>();
     static Stack<String> codeLabelSpace = new Stack<>();
 
     //store all vars which are function names
@@ -34,8 +35,10 @@ public class generalUtils {
         for(String var : buffer) {
             SymbolTable.remove(var);
         }
+        //step2: add global vars hashtable into directory lookup
+        directoryLookup.put("GLOBAL", SymbolTable);
 
-        //step2: forming local hashtables
+        //step3: forming local hashtables and add to directory lookup
         for(String var : SymbolTable.keySet()) {
             Symbol s = SymbolTable.get(var);
             if(s instanceof funcSymbol)
@@ -69,18 +72,15 @@ public class generalUtils {
     }
 
     public static String localOrPara(String varName) {
-        String result = null;
-
-        if (SymbolTable.containsKey(varName)) {
-            result = "NOT";
-        }
+        String result;
+        String scope = getCurrentScope();
+        if (SymbolTable.containsKey(varName)) result = "NOT";
         else {
-            for(funcSymbol s : funcSyms) {
-                if(s.isLocal(varName)) {
-                    result = s.getLocalOrPara(varName);
-                }
-            }
+            funcSymbol fs = (funcSymbol) SymbolTable.get(scope);
+            if(fs.getLocalOrPara(varName)) return "PARA";
+            else return "LOCAL";
         }
+
         return result;
     }
 
@@ -126,29 +126,38 @@ public class generalUtils {
         return true;
     }
 
-    /**Global namespaces*/
-    public static String generateVarName() {
+    /**Global namespaces && status monitor*/
+    private static String pastScope = "GLOBAL";
+    private static String currentScope = "GLOBAL";
+    protected static int paraCounter = 1;
+    protected static int localCounter = 1;
+    public static void setCurrentScope(String s) {
+        pastScope = currentScope;
+        currentScope = s;
+        varCounter = 1;
 
-        String name = "$T" + varCounter++;
-        varNameSpace.push(name);
-        return name;
+        //some fucntions doesn't explicitly return when finish
+        //need to add it.
+        if(!codeAggregete.isEmpty() && !codeAggregete.get(codeAggregete.size()-1).contains("RET")) {
+            storeCode(";RET\n");
+        }
     }
+    public static String getCurrentScope() { return  currentScope; }
 
-    private static int paraCounter = 1;
+    public static String generateGlobalName() {
+        return "$T" + varCounter++;
+    }
     public static String generateParaName() {
-        String name = "$P" + paraCounter++;
-        varNameSpace.push(name);
-        return name;
+        return "$P" + paraCounter++;
     }
-    private static int localCounter = 1;
     public static String generateLocalName() {
-        String name = "$L" + localCounter++;
-        varNameSpace.push(name);
-        return name;
+        return "$L" + localCounter++;
     }
 
-    public static String getRecentVarName() {
-        return varNameSpace.pop();
+    //when create node for int, float and string, the stack will be used
+    static Stack<String[]> constStack = new Stack<>();
+    public static String[] getRecentConstVar() {
+        return constStack.pop();
     }
 
     public static String generateCodeLabel() { return "label" + labelCounter++; }
@@ -174,7 +183,28 @@ public class generalUtils {
         {
             String current = expr.remove(0);
             String type = varORvalue(current);
-            if(type.contains("VAR")) {
+            if (type.contains("FUNCTION")) {
+                ArrayList<String> paraMeters = new ArrayList<>();
+                //check if next expr exits and it's not an opCode
+                //get all the var before hit an ":="
+                while(!expr.get(0).equals(":=")) {
+                    //then get the next var
+                    String next = expr.remove(0);
+                    paraMeters.add(next);
+                }
+                //if parameter contains operation
+                boolean containsOpCode = paraMeters.contains("-") || paraMeters.contains("+") || paraMeters.contains("*") || paraMeters.contains("/") ;
+                if(containsOpCode) {
+                    ASTgenerator(paraMeters);
+                    opNode node = (opNode)builderStack.pop();
+                    ASTnode newFunc = new funcNode(current, node);
+                    builderStack.push(newFunc);
+                } else {
+                    ASTnode newFunc = new funcNode(current, paraMeters);
+                    builderStack.push(newFunc);
+                }
+
+            } else if(type.contains("VAR")) {
                 String isPara = localOrPara(current);
                 simpleNode node = new simpleNode(type,current, isPara);
                 builderStack.push(node);
@@ -221,8 +251,8 @@ public class generalUtils {
                 ASTnode node = new callNode("READ", arguments);
                 execQueue.add(node);
             } else if (type.equals("RETURN")) {
-                builderStack.pop();//discard the "result" var
-                ASTnode node = new returnNode("test");
+                ASTnode tobeReturned = builderStack.pop();
+                ASTnode node = new returnNode(tobeReturned);
                 execQueue.add(node);
             } else {
                 System.out.println("ERR: unrecognizable symbol \""+type+ "\" in expr");

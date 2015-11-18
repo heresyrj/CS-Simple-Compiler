@@ -7,7 +7,7 @@ public class funcSymbol extends Symbol {
 
     private Scope funcScope;
     private String returnType;
-    private HashMap<String, Symbol> locals;
+    private HashMap<String, funcVar> locals;
 
     public funcSymbol(String name, Scope parent) {
         super("FUNCTION", name, parent);
@@ -15,32 +15,66 @@ public class funcSymbol extends Symbol {
         locals = new HashMap<>();
     }
 
+    private class funcVar {
+        public Symbol symbol;
+        public String type;
+        public String label;
+    }
+
+    public String getFuncVarLabel(String var) {
+        return locals.get(var).label;
+    }
+    public String getFuncVarType(String var) {
+        return locals.get(var).type;
+    }
+
     public void localSymbolTable () {
+        generalUtils.paraCounter = 1;
+        generalUtils.localCounter = 1;
+
         for(Symbol s : funcScope.getSymbolList()) {
             String key = s.sym_getName();
-            locals.put(key, s);
+            funcVar newVar = new funcVar();
+            newVar.symbol = s;
+            newVar.type = generalUtils.getVarType(key);
+            if(getLocalOrPara(key)) {
+                newVar.label = generalUtils.generateParaName();
+            } else {
+                newVar.label = generalUtils.generateLocalName();
+            }
+            locals.put(key, newVar);
         }
+        String funcName = sym_getName();
+        generalUtils.directoryLookup.put(funcName, locals);
     }
 
     public boolean isLocal (String var) {
-        return locals.containsKey(var);
+        for (Symbol s :funcScope.getSymbolList()) {
+            if (s.sym_getName().equals(var)) return true;
+        }
+        return false;
     }
     public String getLocalType(String var) {
-        return locals.get(var).sym_getType();
-    }
-    public String getLocalOrPara(String var)
-    {
-        Symbol s = locals.get(var);
-        boolean para = false;
-        if(s instanceof intSymbol) {
-            para = ((intSymbol)s).isPara();
+        for (Symbol s :funcScope.getSymbolList()) {
+            if (s.sym_getName().equals(var)) return s.sym_getType();
         }
-        if(s instanceof floatSymbol) {
-            para = ((floatSymbol)s).isPara();
+        return "ERR";
+    }
+    public boolean getLocalOrPara(String var)
+    {
+
+        for(Symbol s :funcScope.getSymbolList()){
+            if(s.sym_getName().equals(var)) {
+                if(s instanceof intSymbol) {
+                    return ((intSymbol)s).isPara();
+                }
+                if(s instanceof floatSymbol) {
+                    return ((floatSymbol)s).isPara();
+                }
+            }
         }
 
-        if(para) return "PARA";
-        else return "LOCAL";
+        return false;
 
     }
 

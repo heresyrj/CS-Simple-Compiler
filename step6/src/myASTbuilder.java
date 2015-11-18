@@ -189,6 +189,7 @@ public class myASTbuilder extends MicroBaseListener {
     {
         MicroParser.Func_declContext ct = (MicroParser.Func_declContext) ctx.getParent();
         String func_name = ct.id().getText();
+        generalUtils.setCurrentScope(func_name);
         generalUtils.storeCode(";LABEL "+func_name);
         generalUtils.storeCode(";LINK");
     }

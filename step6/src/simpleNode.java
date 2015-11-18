@@ -22,7 +22,7 @@ public class simpleNode extends ASTnode {
     public void CodeAndResult() {
         //For simple Node the code is it self
         if(getType().equals("INT") || getType().equals("FLOAT")) {
-            temp = generalUtils.generateVarName();
+            temp = generalUtils.generateGlobalName();
             if(getType().equals("INT")) {
                 code = ";STOREI ";
             } else {
@@ -30,15 +30,19 @@ public class simpleNode extends ASTnode {
             }
             code =  code + getValue() +" "+ temp;
             //System.out.println(code);
+            String[] constVar = {getType(),temp};
+            generalUtils.constStack.push(constVar);
+
             generalUtils.storeCode(code);
         }
         else {
-            //unnecessary to generate Temp for var
-            //the code will be depending on the nearest operator
+
             if(belong == null || belong.equals("NOT")) temp = getValue();
             else {
-                if(belong.equals("PARA")) temp = generalUtils.generateParaName();
-                if(belong.equals("LOCAL")) temp = generalUtils.generateLocalName();
+                String var = getValue();
+                String current = generalUtils.getCurrentScope();
+                funcSymbol func = (funcSymbol) generalUtils.SymbolTable.get(current);
+                temp = func.getFuncVarLabel(var);
             }
             code = null;
         }

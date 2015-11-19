@@ -7,6 +7,7 @@ import java.util.HashMap;
 public class IRtoRawASM {
     private ArrayList<String> IRcodes;
     protected HashMap<String, Symbol> SymbolTable = generalUtils.SymbolTable;
+    protected HashMap<String, HashMap> directoryLookup = generalUtils.directoryLookup;
 
     public IRtoRawASM(ArrayList<String> codeAggregete) {
         IRcodes = codeAggregete;
@@ -24,7 +25,43 @@ public class IRtoRawASM {
 
     static ArrayList<IRNode> nodeListIR = new ArrayList<>();
 
+    protected HashMap<String, HashMap<String, ArrayList<String>>> funcSymbolTable = new HashMap<String, HashMap<String, ArrayList<String>>>();
+    protected HashMap<String, ArrayList<Integer>> funcVarsLookup = new HashMap<String, ArrayList<Integer>>();
+    protected HashMap<String, String> TempregHashMap = new HashMap<String, String>();
+
+
     public void buidIRNode() {
+        for (String scope : directoryLookup.keySet()) {
+            HashMap<String, Symbol> map = directoryLookup.get(scope);
+            HashMap<String, ArrayList<String>> tempSymTable = new HashMap<String, ArrayList<String>>();
+            if(!(scope.equals("GLOBAL"))) {
+                int numl = 0;
+                int nump = 0;
+                for(String varname : map.keySet()) {
+                    funcSymbol fs = (funcSymbol) SymbolTable.get(scope);
+                    String type = fs.getFuncVarType(varname);
+                    boolean tmp = fs.getLocalOrPara(varname);
+                    String lp = null;
+                    if(tmp) {
+                        lp = "PARA";
+                        nump++;
+                    } else {
+                        lp = "LOCAL";
+                        numl++;
+                    }
+                    ArrayList<String> templist = new ArrayList<String>();
+                    templist.add(type);
+                    templist.add(lp);
+                    tempSymTable.put(varname, templist);
+                }
+                funcSymbolTable.put(scope, tempSymTable);
+                ArrayList<Integer> templist2 = new ArrayList<Integer>();
+                templist2.add(numl);
+                templist2.add(nump);
+                funcVarsLookup.put(scope, templist2);
+            }
+        }
+
         for (String line : IRcodes) {
             String[] splitline = line.split(" ");
             IRNode newnode = new IRNode();
@@ -33,14 +70,12 @@ public class IRtoRawASM {
             if (splitline[0].contains("STORE")) {
                 newnode.operand1 = splitline[1];
                 newnode.result = splitline[2];
-            } else if (splitline[0].contains("WRITE")) {
+            } else if (splitline[0].contains("WRITE") || splitline[0].contains("LABEL") || splitline[0].contains("JUMP") || splitline[0].contains("READ") || splitline[0].contains("JSR")) {
                 newnode.result = splitline[1];
-            } else if (splitline[0].contains("LABEL")) {
-                newnode.result = splitline[1];
-            } else if (splitline[0].contains("JUMP")) {
-                newnode.result = splitline[1];
-            } else if (splitline[0].contains("READ")) {
-                newnode.result = splitline[1];
+            } else if (splitline[0].contains("PUSH") || splitline[0].contains("POP") || splitline[0].contains("RET") || splitline[0].contains("LINK")) {
+                if(splitline.length > 1) {
+                    newnode.result = splitline[1];
+                }
             }
             else {
                 newnode.operand1 = splitline[1];
@@ -60,7 +95,52 @@ public class IRtoRawASM {
         String operand2;
     }
 
+    private int regcount = -1;
+    private String prevtempreg = "$T1";
+
     static ArrayList<tinyNode> nodeListTiny = new ArrayList<>();
+
+    private String manageReg(String operand, String currentfunc) {
+        ArrayList<Integer> vars = funcVarsLookup.get(currentfunc);
+        int numl = vars.get(0);
+        int nump = vars.get(1);
+
+        if(operand.startsWith("$P")) {
+            int tmp = Integer.parseInt(operand.substring(2));
+            int req = 6 + nump - tmp;
+            return "$"+Integer.toString(req);
+        }
+
+        if(operand.startsWith("$L")) {
+            return "$-"+(operand.substring(2));
+        }
+
+        if(operand.startsWith("$T")) {
+            if(TempregHashMap.containsKey(operand)) {
+                return TempregHashMap.get(operand);
+            } else {
+                if(operand.equals(prevtempreg)) {
+                    TempregHashMap.put(operand, "r"+Integer.toString(regcount));
+                    return "r"+Integer.toString(regcount);
+
+                }
+                else {
+                    regcount++;
+                    String reg = Integer.toString(regcount);
+                    prevtempreg = operand;
+                    TempregHashMap.put(operand, "r"+reg);
+                    return "r"+reg;
+                }
+            }
+        }
+
+        if(operand.startsWith("$R")) {
+            int tmp = 6 + nump;
+            return "$"+Integer.toString(tmp);
+        }
+
+        return operand;
+    }
 
     public void generateTinyAssembly() {
         ArrayList<String> variables = new ArrayList<String>();
@@ -69,10 +149,11 @@ public class IRtoRawASM {
 
             Symbol s = SymbolTable.get(varname);
             Scope scope = s.sym_getParentScope();
+            String type = s.sym_getType();
 
-            if (!(varname.equals("temp")) && (scope.getName().equals("GLOBAL"))) {
+            if ((scope.getName().equals("GLOBAL")) && (!(type.equals("FUNCTION")))) {
                 tinyNode newnode = new tinyNode();
-                if((generalUtils.getVarType(varname)).equals("STRING")) {
+                if(type.equals("STRING")) {
                     strSymbol str = (strSymbol) s;
                     String value = str.sym_getStr();
                     newnode.opCode = "str";
@@ -89,9 +170,54 @@ public class IRtoRawASM {
             }
         }
 
+        tinyNode newnode = new tinyNode();
+        newnode.opCode = "push";
+        newnode.operand1 = "";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "push";
+        newnode.operand1 = "r0";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "push";
+        newnode.operand1 = "r1";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "push";
+        newnode.operand1 = "r2";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "push";
+        newnode.operand1 = "r3";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "jsr";
+        newnode.operand1 = "main";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+        newnode = new tinyNode();
+        newnode.opCode = "sys";
+        newnode.operand1 = "halt";
+        newnode.operand2 = "";
+        nodeListTiny.add(newnode);
+
+
         int reg = 99;
+        tinyNode prevnode = new tinyNode();
+        String currentfunc = null;
         for (IRNode aNodeListIR : nodeListIR) {
-            tinyNode newnode = new tinyNode();
+            newnode = new tinyNode();
             switch (aNodeListIR.opCode) {
                 case "STOREI":
                 case "STOREF":
@@ -107,47 +233,161 @@ public class IRtoRawASM {
                         tempnode.operand2 = aNodeListIR.result;
                         nodeListTiny.add(tempnode);
                         reg++;
-                    } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else if(aNodeListIR.operand1.startsWith("$L") && aNodeListIR.result.startsWith("$R")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
+                        regcount++;
+                        newnode.operand2 = "r"+Integer.toString(regcount);
+                        nodeListTiny.add(newnode);
+
+                        tinyNode tempnode = new tinyNode();
+                        tempnode.opCode = "move";
+                        tempnode.operand1 = "r"+ Integer.toString(regcount);
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                        nodeListTiny.add(tempnode);
+                    }
+                    else {
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.result.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                        if (aNodeListIR.result.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.result;
                         }
                         nodeListTiny.add(newnode);
                     }
                     break;
+
+                case "PUSH": {
+                    newnode.opCode = "push";
+                    if(aNodeListIR.result != null) {
+                       if (aNodeListIR.result.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.result, currentfunc);
+                        } else {
+                            newnode.operand1 = aNodeListIR.result;
+                        } 
+                    } else {
+                        newnode.operand1 = "";
+                    }
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+                    break;
+                }
+                case "POP": {
+                    newnode.opCode = "pop";
+                    if(aNodeListIR.result != null) {
+                       if (aNodeListIR.result.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.result, currentfunc);
+                        } else {
+                            newnode.operand1 = aNodeListIR.result;
+                        } 
+                    } else {
+                        newnode.operand1 = "";
+                    }
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+                    break;
+                }
+                case "JSR": {
+                    newnode.opCode = "push";
+                    newnode.operand1 = "r0";
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+
+                    tinyNode newnode2 = new tinyNode();
+                    newnode2.opCode = "push";
+                    newnode2.operand1 = "r1";
+                    newnode2.operand2 = "";
+                    nodeListTiny.add(newnode2);
+                    
+                    tinyNode newnode3 = new tinyNode();
+                    newnode3.opCode = "push";
+                    newnode3.operand1 = "r2";
+                    newnode3.operand2 = "";
+                    nodeListTiny.add(newnode3);
+                    
+                    tinyNode newnode4 = new tinyNode();
+                    newnode4.opCode = "push";
+                    newnode4.operand1 = "r3";
+                    newnode4.operand2 = "";
+                    nodeListTiny.add(newnode4);
+                    
+                    tinyNode newnode5 = new tinyNode();
+                    newnode5.opCode = "jsr";
+                    newnode5.operand1 = aNodeListIR.result;
+                    newnode5.operand2 = "";
+                    nodeListTiny.add(newnode5);
+
+                    tinyNode newnode6 = new tinyNode();
+                    newnode6.opCode = "pop";
+                    newnode6.operand1 = "r3";
+                    newnode6.operand2 = "";
+                    nodeListTiny.add(newnode6);
+
+                    tinyNode newnode7 = new tinyNode();
+                    newnode7.opCode = "pop";
+                    newnode7.operand1 = "r2";
+                    newnode7.operand2 = "";
+                    nodeListTiny.add(newnode7);
+
+                    tinyNode newnode8 = new tinyNode();
+                    newnode8.opCode = "pop";
+                    newnode8.operand1 = "r1";
+                    newnode8.operand2 = "";
+                    nodeListTiny.add(newnode8);
+
+                    tinyNode newnode9 = new tinyNode();
+                    newnode9.opCode = "pop";
+                    newnode9.operand1 = "r0";
+                    newnode9.operand2 = "";
+                    nodeListTiny.add(newnode9);
+
+                    break;
+                }
+                    
                 case "WRITEI":
                     newnode.opCode = "sys";
                     newnode.operand1 = "writei";
-                    newnode.operand2 = aNodeListIR.result;
+
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                    } else {
+                        newnode.operand2 = aNodeListIR.result;
+                    }
+
                     nodeListTiny.add(newnode);
                     break;
                 case "WRITEF":
                     newnode.opCode = "sys";
                     newnode.operand1 = "writer";
-                    newnode.operand2 = aNodeListIR.result;
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                    } else {
+                        newnode.operand2 = aNodeListIR.result;
+                    }
                     nodeListTiny.add(newnode);
                     break;
                 case "WRITES":
                     newnode.opCode = "sys";
                     newnode.operand1 = "writes";
-                    newnode.operand2 = aNodeListIR.result;
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                    } else {
+                        newnode.operand2 = aNodeListIR.result;
+                    }
                     nodeListTiny.add(newnode);
                     break;
                 case "ADDI": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -155,13 +395,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "addi";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));                        
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);                        
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));                    
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);                    
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -170,13 +410,13 @@ public class IRtoRawASM {
                 }
                 case "ADDF": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -184,13 +424,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "addr";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -199,13 +439,13 @@ public class IRtoRawASM {
                 }
                 case "SUBI": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -213,13 +453,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "subi";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -228,13 +468,13 @@ public class IRtoRawASM {
                 }
                 case "SUBF": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -242,13 +482,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "subr";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -257,13 +497,13 @@ public class IRtoRawASM {
                 }
                 case "MULTI": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -271,13 +511,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "muli";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -286,13 +526,13 @@ public class IRtoRawASM {
                 }
                 case "MULTF": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -300,13 +540,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "mulr";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -315,13 +555,13 @@ public class IRtoRawASM {
                 }
                 case "DIVI": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -329,13 +569,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "divi";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -344,13 +584,13 @@ public class IRtoRawASM {
                 }
                 case "DIVF": {
                     newnode.opCode = "move";
-                    if (aNodeListIR.operand1.startsWith("$T")) {
-                        newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    if (aNodeListIR.operand1.startsWith("$")) {
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                     } else {
                         newnode.operand1 = aNodeListIR.operand1;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        newnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         newnode.operand2 = aNodeListIR.result;
                     }
@@ -358,13 +598,13 @@ public class IRtoRawASM {
 
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "divr";
-                    if (aNodeListIR.operand2.startsWith("$T")) {
-                        tempnode.operand1 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                    if (aNodeListIR.operand2.startsWith("$")) {
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
-                    if (aNodeListIR.result.startsWith("$T")) {
-                        tempnode.operand2 = String.format("r%s", aNodeListIR.result.substring(2));
+                    if (aNodeListIR.result.startsWith("$")) {
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -376,8 +616,37 @@ public class IRtoRawASM {
                     newnode.operand1 = aNodeListIR.result;
                     newnode.operand2 = "";
                     nodeListTiny.add(newnode);
+                    prevnode = newnode;
                     break;
                 }
+
+                case "LINK": {
+                    newnode.opCode = "link";
+                    TempregHashMap = new HashMap<String, String>();
+                    ArrayList<Integer> vars = funcVarsLookup.get(prevnode.operand1);
+                    int loc = vars.get(0);
+                    newnode.operand1 = Integer.toString(loc);
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+                    currentfunc = prevnode.operand1;
+                    regcount++;
+                    break;
+                }
+
+                case "RET\n": {
+                    newnode.opCode = "unlnk";
+                    newnode.operand1 = "";
+                    newnode.operand2 = "";
+                    nodeListTiny.add(newnode);
+
+                    tinyNode tempnode = new tinyNode();
+                    tempnode.opCode = "ret";
+                    tempnode.operand1 = "";
+                    tempnode.operand2 = "";
+                    nodeListTiny.add(tempnode);
+                    break;
+                }
+
                 case "JUMP": {
                     newnode.opCode = "jmp";
                     newnode.operand1 = aNodeListIR.result;
@@ -401,6 +670,8 @@ public class IRtoRawASM {
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -416,13 +687,13 @@ public class IRtoRawASM {
                         nodeListTiny.add(newnode);
                         reg++;
                     } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -453,6 +724,8 @@ public class IRtoRawASM {
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -468,13 +741,13 @@ public class IRtoRawASM {
                         nodeListTiny.add(newnode);
                         reg++;
                     } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -505,6 +778,8 @@ public class IRtoRawASM {
 
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -520,13 +795,13 @@ public class IRtoRawASM {
                         nodeListTiny.add(newnode);
                         reg++;
                     } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -556,6 +831,8 @@ public class IRtoRawASM {
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -571,13 +848,13 @@ public class IRtoRawASM {
                         nodeListTiny.add(newnode);
                         reg++;
                     } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -607,6 +884,8 @@ public class IRtoRawASM {
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -622,13 +901,13 @@ public class IRtoRawASM {
                         nodeListTiny.add(newnode);
                         reg++;
                     } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -658,6 +937,8 @@ public class IRtoRawASM {
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
+                    } else if(aNodeListIR.operand1.startsWith("$") && aNodeListIR.operand2.startsWith("$")) {
+                        newnode.opCode = "cmpi";
                     } else {
                         newnode.opCode = "cmpr";
                     }
@@ -672,14 +953,27 @@ public class IRtoRawASM {
                         newnode.operand2 = "r"+ Integer.toString(reg);
                         nodeListTiny.add(newnode);
                         reg++;
-                    } else {
-                        if (aNodeListIR.operand1.startsWith("$T")) {
-                            newnode.operand1 = String.format("r%s", aNodeListIR.operand1.substring(2));
+                    } else if(aNodeListIR.operand1.startsWith("$L") && aNodeListIR.operand2.startsWith("$L")) {
+                        tinyNode tempnode = new tinyNode();
+                        regcount++;
+                        tempnode.opCode = "move";
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
+                        tempnode.operand2 = "r"+Integer.toString(regcount);
+                        nodeListTiny.add(tempnode);
+
+                        newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
+                        newnode.operand2 = "r"+Integer.toString(regcount);
+                        nodeListTiny.add(newnode);
+                        regcount++;
+                    }
+                        else {
+                        if (aNodeListIR.operand1.startsWith("$")) {
+                            newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.operand1;
                         }
-                        if (aNodeListIR.operand2.startsWith("$T")) {
-                            newnode.operand2 = String.format("r%s", aNodeListIR.operand2.substring(2));
+                        if (aNodeListIR.operand2.startsWith("$")) {
+                            newnode.operand2 = manageReg(aNodeListIR.operand2, currentfunc);
                         } else {
                             newnode.operand2 = aNodeListIR.operand2;
                         }
@@ -696,14 +990,22 @@ public class IRtoRawASM {
                 case "READI": {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readi";
-                    newnode.operand2 = aNodeListIR.result;
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                    } else {
+                        newnode.operand2 = aNodeListIR.result;
+                    }
                     nodeListTiny.add(newnode);
                     break;
                 }
                 case "READF": {
                     newnode.opCode = "sys";
                     newnode.operand1 = "readr";
-                    newnode.operand2 = aNodeListIR.result;
+                    if (aNodeListIR.result.startsWith("$")) {
+                        newnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                    } else {
+                        newnode.operand2 = aNodeListIR.result;
+                    }
                     nodeListTiny.add(newnode);
                     break;
                 }
@@ -717,7 +1019,7 @@ public class IRtoRawASM {
         for (tinyNode aNodeListTiny : nodeListTiny) {
             System.out.println(aNodeListTiny.opCode + " " + aNodeListTiny.operand1 + " " + aNodeListTiny.operand2);
         }
-        System.out.println("sys halt");
+        System.out.print("end");
     }
 
 }

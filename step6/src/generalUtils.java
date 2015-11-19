@@ -270,8 +270,8 @@ public class generalUtils {
         }
         System.out.println(";tiny code");
 
-        //IRtoRawASM converter = new IRtoRawASM(codeAggregete);
-        //converter.printTiny();
+        IRtoRawASM converter = new IRtoRawASM(codeAggregete);
+        converter.printTiny();
 
     }
 

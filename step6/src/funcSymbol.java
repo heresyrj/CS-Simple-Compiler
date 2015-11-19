@@ -73,9 +73,7 @@ public class funcSymbol extends Symbol {
                 }
             }
         }
-
         return false;
-
     }
 
     public Scope getOwnScope() {

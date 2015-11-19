@@ -39,8 +39,9 @@ public class returnNode extends ASTnode {
         String opCode = null;
         if(varType != null) {
             if(varType.contains("FLOAT")) opCode = ";STOREF";
-            else if (varType.contains("INT")) opCode = ";STOREI";
-            else opCode = ";STORES";
+            else opCode = ";STOREI";
+//            else if (varType.contains("INT")) opCode = ";STOREI";
+//            else opCode = ";STORES";
         }
 
         code = opCode + " "+temp+" $R";

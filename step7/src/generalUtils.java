@@ -274,7 +274,6 @@ public class generalUtils {
         converter.buidIRnode();
         AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
 
-
         //converter.printTiny();
 
     }

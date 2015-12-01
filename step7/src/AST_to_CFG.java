@@ -9,16 +9,17 @@ public class AST_to_CFG {
     final private ArrayList<IRnode> origNodes;
     final private ArrayList<IRnode> nodes;
 
-    private ArrayList<Integer> leaders;
+    //private ArrayList<IRnode> leaderNodes; //--> turns out to be unnecessary once new mark filed is added to IRnode, preserve to debug
     private HashMap<Integer, Integer> adjacency;
 
     public AST_to_CFG (ArrayList<IRnode> nodes) {
         origNodes = nodes;
-        this.nodes = purifyNodes(nodes);
-        leaders = new ArrayList<>();
+        this.nodes = purifyNodes((ArrayList<IRnode>) nodes.clone());
+        //leaderNodes = new ArrayList<>();
         //simply treat every single statement as a block
         adjacency = new HashMap<>();
         generateLeaders();
+        generateInOut();
     }
 
     //this method get rid of "LINK"
@@ -40,7 +41,7 @@ public class AST_to_CFG {
 
 
     private void generateLeaders () {
-
+        ArrayList<Integer> leaders = new ArrayList<>();
         IRnode previous;
         IRnode current = null;
 
@@ -79,15 +80,41 @@ public class AST_to_CFG {
 
         Collections.sort(leaders);
 
-        /*** For Debug ***/
-        System.out.println("\nLeaders :");
+
         for(Integer index : leaders) {
             IRnode node = nodes.get(index);
-            System.out.println(node.opCode +" "+ node.operand1 +" " + node.result);
+            node.isleader = true;
+            //leaderNodes.add(node);
         }
+
+        /** for debug **/
+//        System.out.println("\nLeaders :");
+//        for(Integer index : leaders) {
+//            IRnode node = nodes.get(index);
+//            System.out.println(node.opCode + " " + node.operand1 + " " + node.result);
+//        }
+//        System.out.println("End of Leaders");
+
     }
 
+    private void generateInOut() {
+        /**
+         * check if all leaders are labeled in origNodes
+         * for debug
+         * **/
+        System.out.println("\nLeaders :");
+        for(IRnode node : origNodes) {
+            if(node.isleader) {
+                System.out.println(origNodes.indexOf(node)+1+": "+node.opCode +" "+ node.operand1 +" " + node.result);
+            }
+        }
 
+        
+
+
+
+
+    }
 
 
 }

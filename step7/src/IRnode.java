@@ -1,4 +1,4 @@
-import java.util.HashSet;
+import java.util.ArrayList;
 
 /**
  * Created by jianruan on 11/29/15.
@@ -8,17 +8,18 @@ public class IRnode {
     public String operand1;
     public String operand2;
     public String result;
-    private HashSet<Integer> GEN;
-    private HashSet<Integer> KILL;
+    public boolean isleader = false;
+    private ArrayList<Integer> IN;
+    private ArrayList<Integer> OUT;
 
     public IRnode () {
-        GEN = new HashSet<>();
-        KILL = new HashSet<>();
+        IN = new ArrayList<>();
+        OUT = new ArrayList<>();
     }
 
     public boolean addToGEN (int instruc) {
-        return GEN.add(instruc);
+        return IN.add(instruc);
     }
 
-    public boolean addToKILL (int instruc) { return KILL.add(instruc);}
+    public boolean addToKILL (int instruc) { return OUT.add(instruc);}
 }

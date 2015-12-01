@@ -1,15 +1,14 @@
 /**
  * Created by jianruan on 10/15/15.
  */
-public class ASTNode_OP extends ASTnode {
+public class ASTNode_Op extends ASTNode {
 
-    private ASTnode leftNode;
-    private ASTnode rightNode;
-    String line;
-
+    private ASTNode leftNode;
+    private ASTNode rightNode;
 
 
-    public ASTNode_OP(String opcode, ASTnode left, ASTnode right) {
+
+    public ASTNode_Op(String opcode, ASTNode left, ASTNode right) {
         super("OP", opcode);
         leftNode = left;
         rightNode = right;
@@ -18,7 +17,7 @@ public class ASTNode_OP extends ASTnode {
 
     public String getOpcode () {return getValue();}
     public String getTemp () {return temp;}
-    public ASTnode getAnode() {return rightNode;}
+    public ASTNode getAnode() {return rightNode;}
 
 
     public void CodeAndResult()
@@ -28,35 +27,36 @@ public class ASTNode_OP extends ASTnode {
         String op = getOpcode();
         switch (op) {
             case ":=":
-                line = ";"+determineOperator(op) + " "+ rightNode.temp +" "+ leftNode.temp;
+                code = ";"+determineOperator(op) + " "+ rightNode.temp +" "+ leftNode.temp;
                 break;
             case "+":
-                line = arithmCodeGen("+");
+                code = arithmCodeGen("+");
                 break;
             case "-":
-                line = arithmCodeGen("-");
+                code = arithmCodeGen("-");
                 break;
             case "*":
-                line = arithmCodeGen("*");
+                code = arithmCodeGen("*");
                 break;
             case "/":
-                line = arithmCodeGen("/");
+                code = arithmCodeGen("/");
                 break;
             default:
                 System.out.println("non-exit opcode");
                 break;
         }
-        addCodeToNode(line);
+        //System.out.println(code);
+        generalUtils.storeCode(code);
     }
 
     public String arithmCodeGen(String op) {
         temp = generalUtils.generateGlobalName();
-        String line = ";"+determineOperator(op) + " " + leftNode.temp + " " +rightNode.temp + " " + temp;
-        return line;
+        code = ";"+determineOperator(op) + " " + leftNode.temp + " " +rightNode.temp + " " + temp;
+        return code;
     }
-    public String getDataType(ASTnode node) {
+    public String getDataType(ASTNode node) {
         if (node.getType().equals("OP")) {
-            ASTNode_OP opnode = (ASTNode_OP)node;
+            ASTNode_Op opnode = (ASTNode_Op)node;
             return getDataType(opnode.rightNode);
         } else {
             return node.getType();

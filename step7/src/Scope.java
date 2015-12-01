@@ -66,7 +66,7 @@ public class Scope {
                 //part1
                 System.out.print("Symbol table GLOBAL\n");
                 //part2
-                Symbol_PROGRAM ps = (Symbol_PROGRAM) s;
+                Symbol_Program ps = (Symbol_Program) s;
                 //
                 ps.getOwnScope().printSymbols();
 
@@ -75,7 +75,7 @@ public class Scope {
                 //part1
                 System.out.print("Symbol table " + name + "\n");
                 //part2
-                Symbol_FUCNTION fs = (Symbol_FUCNTION) s;
+                Symbol_Func fs = (Symbol_Func) s;
                 fs.getOwnScope().printSymbols();
 
             } else if (type.equals("BLOCK")) {
@@ -91,7 +91,7 @@ public class Scope {
             }
 
             if (type.equals("STRING")) {
-                String value = ((Symbol_STRING) s).sym_getStr();
+                String value = ((Symbol_Str) s).sym_getStr();
                 System.out.print("value ");
                 System.out.print(value);
 

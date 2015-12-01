@@ -13,18 +13,11 @@ public class generalUtils {
     static int varCounter = 1;
     static int labelCounter = 1;
     static ArrayList<String> codeAggregete = new ArrayList<>();
+
     static Stack<String> codeLabelSpace = new Stack<>();
 
     //store all vars which are function names
-    static ArrayList<Symbol_FUCNTION> funcSyms = new ArrayList<>();
-
-    //store all the AST nodes
-    private static int counter = 0;
-    private static HashMap<Integer, ASTnode> ASTaggregate = new HashMap<>();
-    private static void addASTnode(ASTnode node) {
-        ASTaggregate.put(counter++,node);
-    }
-    public HashMap<Integer, ASTnode> getASTaggregate() {return ASTaggregate;}
+    static ArrayList<Symbol_Func> funcSyms = new ArrayList<>();
 
     public static void addSymboltoTable(String varName,Symbol symbol)
     {
@@ -48,12 +41,12 @@ public class generalUtils {
         //step3: forming local hashtables and add to directory lookup
         for(String var : SymbolTable.keySet()) {
             Symbol s = SymbolTable.get(var);
-            if(s instanceof Symbol_FUCNTION)
+            if(s instanceof Symbol_Func)
             {
-                funcSyms.add((Symbol_FUCNTION) s);
+                funcSyms.add((Symbol_Func) s);
             }
         }
-        for(Symbol_FUCNTION s : funcSyms) {
+        for(Symbol_Func s : funcSyms) {
             //generate HashMaps for local scope
             s.localSymbolTable();
         }
@@ -68,7 +61,7 @@ public class generalUtils {
             return type;
         }
         else {
-            for(Symbol_FUCNTION s : funcSyms) {
+            for(Symbol_Func s : funcSyms) {
                 if(s.isLocal(varName)) {
                     type = s.getLocalType(varName) + "VAR";
                     return type;
@@ -83,7 +76,7 @@ public class generalUtils {
         String scope = getCurrentScope();
         if (SymbolTable.containsKey(varName)) result = "NOT";
         else {
-            Symbol_FUCNTION fs = (Symbol_FUCNTION) SymbolTable.get(scope);
+            Symbol_Func fs = (Symbol_Func) SymbolTable.get(scope);
             if(fs.getLocalOrPara(varName)) return "PARA";
             else return "LOCAL";
         }
@@ -182,10 +175,10 @@ public class generalUtils {
     /***********************************************************************
      * AST tree generation
      * */
-    static Stack<ASTnode> builderStack = new Stack<>();
-    static ArrayList<ASTnode> execQueue = new ArrayList<>();//stores all the statement AST
+    static Stack<ASTNode> builderStack = new Stack<>();
+    static ArrayList<ASTNode> execQueue = new ArrayList<>();//stores all the statement AST
     public static void ASTgenerator(ArrayList<String> expr) {
-        //step1 TODO: create ASTnode
+        //step1 TODO: create ASTNode
         while(!expr.isEmpty())
         {
             String current = expr.remove(0);
@@ -203,63 +196,63 @@ public class generalUtils {
                 boolean containsOpCode = paraMeters.contains("-") || paraMeters.contains("+") || paraMeters.contains("*") || paraMeters.contains("/") ;
                 if(containsOpCode) {
                     ASTgenerator(paraMeters);
-                    ASTNode_OP node = (ASTNode_OP)builderStack.pop();
-                    ASTnode newFunc = new ASTNode_FUNCTION(current, node);
+                    ASTNode_Op node = (ASTNode_Op)builderStack.pop();
+                    ASTNode newFunc = new ASTNode_Func(current, node);
                     builderStack.push(newFunc);
                 } else {
-                    ASTnode newFunc = new ASTNode_FUNCTION(current, paraMeters);
+                    ASTNode newFunc = new ASTNode_Func(current, paraMeters);
                     builderStack.push(newFunc);
                 }
 
             } else if(type.contains("VAR")) {
                 String isPara = localOrPara(current);
-                ASTNode_SIMPLE node = new ASTNode_SIMPLE(type,current, isPara);
+                ASTNode_Simple node = new ASTNode_Simple(type,current, isPara);
                 builderStack.push(node);
             } else if (type.equals("INT")) {
-                ASTNode_SIMPLE node = new ASTNode_SIMPLE("INT",current, null);
+                ASTNode_Simple node = new ASTNode_Simple("INT",current, null);
                 builderStack.push(node);
             } else if (type.equals("FLOAT")) {
-                ASTNode_SIMPLE node = new ASTNode_SIMPLE("FLOAT",current, null);
+                ASTNode_Simple node = new ASTNode_Simple("FLOAT",current, null);
                 builderStack.push(node);
             } else if (type.equals("OP")) {
-                ASTnode right = builderStack.pop();
-                ASTnode left = builderStack.pop();
-                ASTNode_OP node = new ASTNode_OP(current, left, right);
+                ASTNode right = builderStack.pop();
+                ASTNode left = builderStack.pop();
+                ASTNode_Op node = new ASTNode_Op(current, left, right);
                 if(current.equals(":=")){
                     execQueue.add(node);
                 } else {
                     builderStack.push(node);
                 }
             } else if (type.equals("CMP")) {
-                ASTnode right = builderStack.pop();
-                ASTnode left = builderStack.pop();
-                ASTNode_CMP node = new ASTNode_CMP(current, left, right, peekLabel());
+                ASTNode right = builderStack.pop();
+                ASTNode left = builderStack.pop();
+                ASTNode_Cmp node = new ASTNode_Cmp(current, left, right, peekLabel());
                 execQueue.add(node);
 
             } else if (type.equals("WRITE")){
-                ArrayList<ASTnode> arguments = new ArrayList<>();
+                ArrayList<ASTNode> arguments = new ArrayList<>();
                 while(!builderStack.isEmpty())
                 {
                     arguments.add(builderStack.pop());
                 }
-                //ASTnode argument = builderStack.pop();
-                ASTnode node = new ASTNode_CALL("WRITE", arguments);
+                //ASTNode argument = builderStack.pop();
+                ASTNode node = new ASTNode_Call("WRITE", arguments);
                 execQueue.add(node);
             } else if (type.equals("READ")){
-                //step1: create ASTnode for the var that will hold value that "READ" get
+                //step1: create ASTNode for the var that will hold value that "READ" get
                 ASTgenerator(expr);
                 //step2: create arguments list
-                ArrayList<ASTnode> arguments = new ArrayList<>();
+                ArrayList<ASTNode> arguments = new ArrayList<>();
                 while(!builderStack.isEmpty())
                 {
                     arguments.add(builderStack.pop());
                 }
-                //step3: create "READ" ASTnode;
-                ASTnode node = new ASTNode_CALL("READ", arguments);
+                //step3: create "READ" ASTNode;
+                ASTNode node = new ASTNode_Call("READ", arguments);
                 execQueue.add(node);
             } else if (type.equals("RETURN")) {
-                ASTnode tobeReturned = builderStack.pop();
-                ASTnode node = new ASTNode_RETURN(tobeReturned);
+                ASTNode tobeReturned = builderStack.pop();
+                ASTNode node = new ASTNode_Return(tobeReturned);
                 execQueue.add(node);
             } else {
                 System.out.println("ERR: unrecognizable symbol \""+type+ "\" in expr");
@@ -268,17 +261,21 @@ public class generalUtils {
 
     }
 
+
     public static void compile() {
 
-        System.out.println(";IR code");
+        //System.out.println(";IR code");
         for(String line : codeAggregete) {
             System.out.println(line);
         }
-        System.out.println(";tiny code");
+        //System.out.println(";tiny code");
 
-        AST2IR ast2ir = new AST2IR(codeAggregete);
-        AST_to_CFG ASTtoCfg = new AST_to_CFG();
-        //Tiny tiny = new Tiny(ast2ir.funcVarsLookup, ast2ir.nodeListIR);
+        IRtoRawASM converter = new IRtoRawASM(codeAggregete);
+        converter.buidIRnode();
+        AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
+
+
+        //converter.printTiny();
 
     }
 

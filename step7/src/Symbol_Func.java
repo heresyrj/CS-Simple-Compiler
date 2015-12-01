@@ -3,13 +3,13 @@ import java.util.HashMap;
 /**
  * Created by jianruan on 9/19/15.
  */
-public class Symbol_FUCNTION extends Symbol {
+public class Symbol_Func extends Symbol {
 
     private Scope funcScope;
     private String returnType;
     private HashMap<String, funcVar> locals;
 
-    public Symbol_FUCNTION(String name, Scope parent) {
+    public Symbol_Func(String name, Scope parent) {
         super("FUNCTION", name, parent);
         funcScope = new Scope("FUNCTION", parent);
         locals = new HashMap<>();
@@ -65,11 +65,11 @@ public class Symbol_FUCNTION extends Symbol {
 
         for(Symbol s :funcScope.getSymbolList()){
             if(s.sym_getName().equals(var)) {
-                if(s instanceof Symbol_INT) {
-                    return ((Symbol_INT)s).isPara();
+                if(s instanceof Symbol_Int) {
+                    return ((Symbol_Int)s).isPara();
                 }
-                if(s instanceof Symbol_FLOAT) {
-                    return ((Symbol_FLOAT)s).isPara();
+                if(s instanceof Symbol_Float) {
+                    return ((Symbol_Float)s).isPara();
                 }
             }
         }

@@ -1,14 +1,13 @@
 /**
  * Created by jianruan on 10/15/15.
  */
-public class ASTNode_CMP extends ASTnode {
+public class ASTNode_Cmp extends ASTNode {
 
-    private ASTnode leftNode;
-    private ASTnode rightNode;
+    private ASTNode leftNode;
+    private ASTNode rightNode;
     private String label;
-    private String line;
 
-    public ASTNode_CMP(String cmpCode, ASTnode left, ASTnode right, String label) {
+    public ASTNode_Cmp(String cmpCode, ASTNode left, ASTNode right, String label) {
         super("CMP", cmpCode);
         leftNode = left;
         rightNode =right;
@@ -18,40 +17,40 @@ public class ASTNode_CMP extends ASTnode {
 
     public String getCmpcode () {return getValue();}
     public String getTemp () {return label;}
-    public ASTnode getAnode() {return rightNode;}
+    public ASTNode getAnode() {return rightNode;}
 
     public void CodeAndResult()
     {
         String cmp = getCmpcode();
         switch (cmp) {
             case "=":
-                line = cmpCodeGen("=");
+                code = cmpCodeGen("=");
                 break;
             case "!=":
-                line = cmpCodeGen("!=");
+                code = cmpCodeGen("!=");
                 break;
             case "<":
-                line = cmpCodeGen("<");
+                code = cmpCodeGen("<");
                 break;
             case ">":
-                line = cmpCodeGen(">");
+                code = cmpCodeGen(">");
                 break;
             case "<=":
-                line = cmpCodeGen("<=");
+                code = cmpCodeGen("<=");
                 break;
             case ">=":
-                line = cmpCodeGen(">=");
+                code = cmpCodeGen(">=");
                 break;
             default:
                 System.out.println("non-exit cmpCode");
                 break;
         }
         //System.out.println(code);
-        addCodeToNode(line);
+        generalUtils.storeCode(code);
     }
 
     public String cmpCodeGen(String cmp) {
-        String code = ";"+determineOperator(cmp) + " " + leftNode.temp + " " +rightNode.temp + " " + label;
+        code = ";"+determineOperator(cmp) + " " + leftNode.temp + " " +rightNode.temp + " " + label;
         return code;
     }
 

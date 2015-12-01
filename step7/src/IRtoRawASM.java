@@ -2,10 +2,88 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by jianruan on 11/20/15.
+ * Created by jianruan on 10/25/15.
  */
-public class Tiny {
+public class IRtoRawASM {
+    private ArrayList<String> IRcodes;
+    protected HashMap<String, Symbol> SymbolTable = generalUtils.SymbolTable;
+    protected HashMap<String, HashMap> directoryLookup = generalUtils.directoryLookup;
 
+    public IRtoRawASM(ArrayList<String> codeAggregete) {
+        IRcodes = codeAggregete;
+    }
+
+    /*****************************************************************************
+     * IRnode Generation
+     */
+
+    private ArrayList<IRnode> nodeListIR = new ArrayList<>();
+
+    protected HashMap<String, HashMap<String, ArrayList<String>>> funcSymbolTable = new HashMap<String, HashMap<String, ArrayList<String>>>();
+    protected HashMap<String, ArrayList<Integer>> funcVarsLookup = new HashMap<String, ArrayList<Integer>>();
+    protected HashMap<String, String> TempregHashMap = new HashMap<String, String>();
+
+
+    public void buidIRnode() {
+        for (String scope : directoryLookup.keySet()) {
+            HashMap<String, Symbol> map = directoryLookup.get(scope);
+            HashMap<String, ArrayList<String>> tempSymTable = new HashMap<String, ArrayList<String>>();
+            if(!(scope.equals("GLOBAL"))) {
+                int numl = 0;
+                int nump = 0;
+                for(String varname : map.keySet()) {
+                    Symbol_Func fs = (Symbol_Func) SymbolTable.get(scope);
+                    String type = fs.getFuncVarType(varname);
+                    boolean tmp = fs.getLocalOrPara(varname);
+                    String lp = null;
+                    if(tmp) {
+                        lp = "PARA";
+                        nump++;
+                    } else {
+                        lp = "LOCAL";
+                        numl++;
+                    }
+                    ArrayList<String> templist = new ArrayList<String>();
+                    templist.add(type);
+                    templist.add(lp);
+                    tempSymTable.put(varname, templist);
+                }
+                funcSymbolTable.put(scope, tempSymTable);
+                ArrayList<Integer> templist2 = new ArrayList<Integer>();
+                templist2.add(numl);
+                templist2.add(nump);
+                funcVarsLookup.put(scope, templist2);
+            }
+        }
+
+        for (String line : IRcodes) {
+            String[] splitline = line.split(" ");
+            IRnode newnode = new IRnode();
+            int len = splitline[0].length();
+            newnode.opCode = splitline[0].substring(1, len);
+            if (splitline[0].contains("STORE")) {
+                newnode.operand1 = splitline[1];
+                newnode.result = splitline[2];
+            } else if (splitline[0].contains("WRITE") || splitline[0].contains("LABEL") || splitline[0].contains("JUMP") || splitline[0].contains("READ") || splitline[0].contains("JSR")) {
+                newnode.result = splitline[1];
+            } else if (splitline[0].contains("PUSH") || splitline[0].contains("POP") || splitline[0].contains("RET") || splitline[0].contains("LINK")) {
+                if(splitline.length > 1) {
+                    newnode.result = splitline[1];
+                }
+            }
+            else {
+                newnode.operand1 = splitline[1];
+                newnode.operand2 = splitline[2];
+                newnode.result = splitline[3];
+            }
+            nodeListIR.add(newnode);
+        }
+
+    }
+
+    public ArrayList<IRnode> getIRnodes() {
+        return nodeListIR;
+    }
 
     /***********************************************************************
      * TinyNode Generation
@@ -14,19 +92,6 @@ public class Tiny {
         String opCode;
         String operand1;
         String operand2;
-    }
-
-    private HashMap<String, String> TempregHashMap;
-    private HashMap<String, ArrayList<Integer>> funcVarsLookup;
-    private HashMap<String, Symbol> SymbolTable;
-    private ArrayList<IR> nodeListIR;
-
-    public Tiny (HashMap<String, ArrayList<Integer>> funcVarsLookup, ArrayList<IR> nodeListIR ) {
-        this.funcVarsLookup = funcVarsLookup;
-        this.nodeListIR = nodeListIR;
-        SymbolTable = generalUtils.SymbolTable;
-        TempregHashMap = new HashMap<>();
-        printTiny();
     }
 
     private int regcount = -1;
@@ -88,7 +153,7 @@ public class Tiny {
             if ((scope.getName().equals("GLOBAL")) && (!(type.equals("FUNCTION")))) {
                 tinyNode newnode = new tinyNode();
                 if(type.equals("STRING")) {
-                    Symbol_STRING str = (Symbol_STRING) s;
+                    Symbol_Str str = (Symbol_Str) s;
                     String value = str.sym_getStr();
                     newnode.opCode = "str";
                     newnode.operand1 = varname;
@@ -150,7 +215,7 @@ public class Tiny {
         int reg = 99;
         tinyNode prevnode = new tinyNode();
         String currentfunc = null;
-        for (IR aNodeListIR : nodeListIR) {
+        for (IRnode aNodeListIR : nodeListIR) {
             newnode = new tinyNode();
             switch (aNodeListIR.opCode) {
                 case "STOREI":
@@ -197,11 +262,11 @@ public class Tiny {
                 case "PUSH": {
                     newnode.opCode = "push";
                     if(aNodeListIR.result != null) {
-                        if (aNodeListIR.result.startsWith("$")) {
+                       if (aNodeListIR.result.startsWith("$")) {
                             newnode.operand1 = manageReg(aNodeListIR.result, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.result;
-                        }
+                        } 
                     } else {
                         newnode.operand1 = "";
                     }
@@ -212,11 +277,11 @@ public class Tiny {
                 case "POP": {
                     newnode.opCode = "pop";
                     if(aNodeListIR.result != null) {
-                        if (aNodeListIR.result.startsWith("$")) {
+                       if (aNodeListIR.result.startsWith("$")) {
                             newnode.operand1 = manageReg(aNodeListIR.result, currentfunc);
                         } else {
                             newnode.operand1 = aNodeListIR.result;
-                        }
+                        } 
                     } else {
                         newnode.operand1 = "";
                     }
@@ -235,19 +300,19 @@ public class Tiny {
                     newnode2.operand1 = "r1";
                     newnode2.operand2 = "";
                     nodeListTiny.add(newnode2);
-
+                    
                     tinyNode newnode3 = new tinyNode();
                     newnode3.opCode = "push";
                     newnode3.operand1 = "r2";
                     newnode3.operand2 = "";
                     nodeListTiny.add(newnode3);
-
+                    
                     tinyNode newnode4 = new tinyNode();
                     newnode4.opCode = "push";
                     newnode4.operand1 = "r3";
                     newnode4.operand2 = "";
                     nodeListTiny.add(newnode4);
-
+                    
                     tinyNode newnode5 = new tinyNode();
                     newnode5.opCode = "jsr";
                     newnode5.operand1 = aNodeListIR.result;
@@ -280,7 +345,7 @@ public class Tiny {
 
                     break;
                 }
-
+                    
                 case "WRITEI":
                     newnode.opCode = "sys";
                     newnode.operand1 = "writei";
@@ -330,12 +395,12 @@ public class Tiny {
                     tinyNode tempnode = new tinyNode();
                     tempnode.opCode = "addi";
                     if (aNodeListIR.operand2.startsWith("$")) {
-                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);
+                        tempnode.operand1 = manageReg(aNodeListIR.operand2, currentfunc);                        
                     } else {
                         tempnode.operand1 = aNodeListIR.operand2;
                     }
                     if (aNodeListIR.result.startsWith("$")) {
-                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);
+                        tempnode.operand2 = manageReg(aNodeListIR.result, currentfunc);                    
                     } else {
                         tempnode.operand2 = aNodeListIR.result;
                     }
@@ -594,13 +659,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
-
+      
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
@@ -648,13 +713,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
 
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
@@ -701,13 +766,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
-
+                
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
 
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
@@ -755,13 +820,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
 
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
@@ -808,13 +873,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
 
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
@@ -861,13 +926,13 @@ public class Tiny {
                     if(aNodeListIR.operand1.startsWith("$T")) {
                         type1 = null;
                     } else {
-                        type1 = generalUtils.getVarType(aNodeListIR.operand1);
+                        type1 = generalUtils.getVarType(aNodeListIR.operand1);   
                     }
 
                     if(aNodeListIR.operand2.startsWith("$T")) {
                         type2 = null;
                     } else {
-                        type2 = generalUtils.getVarType(aNodeListIR.operand2);
+                        type2 = generalUtils.getVarType(aNodeListIR.operand2);   
                     }
                     if((type1 != null && type1.equals("INT")) || (type2 != null && type2.equals("INT"))) {
                         newnode.opCode = "cmpi";
@@ -900,7 +965,7 @@ public class Tiny {
                         nodeListTiny.add(newnode);
                         regcount++;
                     }
-                    else {
+                        else {
                         if (aNodeListIR.operand1.startsWith("$")) {
                             newnode.operand1 = manageReg(aNodeListIR.operand1, currentfunc);
                         } else {
@@ -948,10 +1013,12 @@ public class Tiny {
     }
 
     public void printTiny() {
+        buidIRnode();
         generateTinyAssembly();
         for (tinyNode aNodeListTiny : nodeListTiny) {
             System.out.println(aNodeListTiny.opCode + " " + aNodeListTiny.operand1 + " " + aNodeListTiny.operand2);
         }
         System.out.print("end");
     }
+
 }

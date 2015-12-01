@@ -3,12 +3,12 @@ import java.util.ArrayList;
 /**
  * Created by jianruan on 10/15/15.
  */
-public class ASTNode_CALL extends ASTnode {
+public class ASTNode_Call extends ASTNode {
 
-    private ArrayList<ASTnode> arguments;
+    private ArrayList<ASTNode> arguments;
+    String result;
 
-
-    public ASTNode_CALL(String call, ArrayList<ASTnode> arguments) {
+    public ASTNode_Call(String call, ArrayList<ASTNode> arguments) {
         super("CALL", call);
         this.arguments = arguments;
         CodeAndResult();
@@ -20,16 +20,17 @@ public class ASTNode_CALL extends ASTnode {
 
         while(!arguments.isEmpty())
         {
-            ASTnode currentNode = arguments.remove(arguments.size()-1);
+            ASTNode currentNode = arguments.remove(arguments.size()-1);
             String currentValue = currentNode.temp;
             String part1 = ";" + determineOperator(currentNode);
-            String line = part1 + " " + currentValue;
-            addCodeToNode(line);
+            code = part1 + " " + currentValue;
+            generalUtils.storeCode(code);
         }
+        //System.out.println(code);
 
     }
 
-    public String determineOperator(ASTnode current) {
+    public String determineOperator(ASTNode current) {
         String call = getCall();
         String type = getDataType(current);
         if (type.contains("INT")) return call+"I";
@@ -37,9 +38,9 @@ public class ASTNode_CALL extends ASTnode {
         else return call+"S";
     }
 
-    public String getDataType(ASTnode node) {
+    public String getDataType(ASTNode node) {
         if (node.getType().equals("OP")) {
-            ASTNode_OP opnode = (ASTNode_OP)node;
+            ASTNode_Op opnode = (ASTNode_Op)node;
             return getDataType(opnode.getAnode());
         } else {
             return node.getType();

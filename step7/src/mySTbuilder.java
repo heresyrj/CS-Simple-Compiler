@@ -74,7 +74,7 @@ public class mySTbuilder extends MicroBaseListener {
     @Override
     public void enterProgram(MicroParser.ProgramContext programContext) {
         //create a new and only program symbol
-        Symbol_PROGRAM ps = new Symbol_PROGRAM("temp", null);
+        Symbol_Program ps = new Symbol_Program("temp", null);
         wrapperScope.addSymbol(ps);
         //Program scope is essentially also the global scope
         //right now the parent scope is null or global;
@@ -112,7 +112,7 @@ public class mySTbuilder extends MicroBaseListener {
         String name = string_declContext.id().getText();
         String value = string_declContext.str().getText();
         //create str symbol
-        Symbol_STRING newStr = new Symbol_STRING(name, value, getCurrentScope());
+        Symbol_Str newStr = new Symbol_Str(name, value, getCurrentScope());
         //add to stack
         symBuffer.add(newStr);
     }
@@ -212,7 +212,7 @@ public class mySTbuilder extends MicroBaseListener {
     public void enterFunc_decl(MicroParser.Func_declContext func_declContext) {
         //create a new func symbol
         Scope current = getCurrentScope();
-        Symbol_FUCNTION fs = new Symbol_FUCNTION("temp", current);
+        Symbol_Func fs = new Symbol_Func("temp", current);
         symBuffer.add(fs);
 
         //dump symbols got so far into current scope
@@ -249,7 +249,7 @@ public class mySTbuilder extends MicroBaseListener {
 
         //set the name and return type of the function
         //now, it's the last element in the parent symbol list
-        Symbol_FUCNTION thisFunc = (Symbol_FUCNTION)getCurrentScope().getLastSymbol();
+        Symbol_Func thisFunc = (Symbol_Func)getCurrentScope().getLastSymbol();
         thisFunc.sym_setName(funcName);
         thisFunc.setReturnType(returnType);
 
@@ -358,10 +358,10 @@ public class mySTbuilder extends MicroBaseListener {
             //create symbol with found type and push to stack
             switch (type) {
                 case "INT":
-                    newVar = new Symbol_INT(name, currentScope, isPara);
+                    newVar = new Symbol_Int(name, currentScope, isPara);
                     break;
                 case "FLOAT":
-                    newVar = new Symbol_FLOAT(name, currentScope, isPara);
+                    newVar = new Symbol_Float(name, currentScope, isPara);
                     break;
                 default:
                     System.out.println("Error, found type is " + type);

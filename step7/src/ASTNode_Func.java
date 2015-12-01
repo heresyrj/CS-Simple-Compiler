@@ -3,23 +3,23 @@ import java.util.ArrayList;
 /**
  * Created by jianruan on 11/17/15.
  */
-public class ASTNode_FUNCTION extends ASTnode {
+public class ASTNode_Func extends ASTNode {
     ArrayList<String> paraMeters;
-    public ASTNode_FUNCTION(String funcName, ArrayList<String> paraMeters) {
+    public ASTNode_Func(String funcName, ArrayList<String> paraMeters) {
         super("FUNCTION",funcName);
         this.paraMeters = paraMeters;
         CodeAndResult();
     }
 
-    ASTNode_OP node;
-    public ASTNode_FUNCTION(String funcName, ASTnode node) {
+    ASTNode_Op node;
+    public ASTNode_Func(String funcName, ASTNode node) {
         super("FUNCTION",funcName);
-        this.node = (ASTNode_OP) node;
+        this.node = (ASTNode_Op) node;
         CodeAndResult2();
     }
     @Override
     public String getType() {
-        Symbol_FUCNTION fs = (Symbol_FUCNTION) generalUtils.SymbolTable.get(getValue());
+        Symbol_Func fs = (Symbol_Func) generalUtils.SymbolTable.get(getValue());
         return fs.getReturnType();
     }
 
@@ -27,36 +27,34 @@ public class ASTNode_FUNCTION extends ASTnode {
     public void CodeAndResult() {
 
         int numOfPara = paraMeters.size();
-        addCodeToNode(";PUSH");
+        generalUtils.storeCode(";PUSH");
 
         String scope = generalUtils.getCurrentScope();
         for (String paraMeter : paraMeters) {
-            Symbol_FUCNTION func = (Symbol_FUCNTION) generalUtils.SymbolTable.get(scope);
+            Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(scope);
             String temporal = func.getFuncVarLabel(paraMeter);
-            addCodeToNode(";PUSH " + temporal);
+            generalUtils.storeCode(";PUSH " + temporal);
         }
 
-        addCodeToNode(";JSR "+ getValue());
+        generalUtils.storeCode(";JSR "+ getValue());
 
         for(int i = 0; i < numOfPara; i++) {
-            addCodeToNode(";POP");
+            generalUtils.storeCode(";POP");
         }
 
         //generate a label for function return value
         temp = generalUtils.generateGlobalName();
-        addCodeToNode(";POP "+temp);
+        generalUtils.storeCode(";POP "+temp);
 
     }
 
     public void CodeAndResult2() {
-        addCodeToNode(";PUSH");
-        addCodeToNode(";PUSH " + node.temp);
-        addCodeToNode(";JSR "+ getValue());
-        addCodeToNode(";POP");
+        generalUtils.storeCode(";PUSH");
+        generalUtils.storeCode(";PUSH " + node.temp);
+        generalUtils.storeCode(";JSR "+ getValue());
+        generalUtils.storeCode(";POP");
         temp = generalUtils.generateGlobalName();
-        addCodeToNode(";POP "+temp);
+        generalUtils.storeCode(";POP "+temp);
     }
-
-
 
 }

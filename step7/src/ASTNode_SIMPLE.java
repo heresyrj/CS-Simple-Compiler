@@ -1,15 +1,14 @@
 /**
  * Created by jianruan on 10/15/15.
  */
-public class ASTNode_SIMPLE extends ASTnode {
+public class ASTNode_Simple extends ASTNode {
 
     /**
         The node stores Either a Var or an Int or a Float
       */
     private String belong = null;//tell if its parameter or local vars or not
-    String line;
 
-    public ASTNode_SIMPLE(String type, String value, String belong)
+    public ASTNode_Simple(String type, String value, String belong)
     {
         //store "VAR" or "INT" or "FLOAT"
         super(type, value);
@@ -25,16 +24,16 @@ public class ASTNode_SIMPLE extends ASTnode {
         if(getType().equals("INT") || getType().equals("FLOAT")) {
             temp = generalUtils.generateGlobalName();
             if(getType().equals("INT")) {
-                line = ";STOREI ";
+                code = ";STOREI ";
             } else {
-                line = ";STOREF ";
+                code = ";STOREF ";
             }
-            line =  line + getValue() +" "+ temp;
+            code =  code + getValue() +" "+ temp;
             //System.out.println(code);
             String[] constVar = {getType(),temp};
             generalUtils.constStack.push(constVar);
 
-            addCodeToNode(line);
+            generalUtils.storeCode(code);
         }
         else {
 
@@ -42,10 +41,10 @@ public class ASTNode_SIMPLE extends ASTnode {
             else {
                 String var = getValue();
                 String current = generalUtils.getCurrentScope();
-                Symbol_FUCNTION func = (Symbol_FUCNTION) generalUtils.SymbolTable.get(current);
+                Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(current);
                 temp = func.getFuncVarLabel(var);
             }
-            //code = null;
+            code = null;
         }
     }
 

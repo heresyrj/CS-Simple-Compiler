@@ -1,10 +1,10 @@
 /**
  * Created by jianruan on 11/14/15.
  */
-public class ASTNode_RETURN extends ASTnode {
-    ASTnode result;
+public class ASTNode_Return extends ASTNode {
+    ASTNode result;
 
-    public ASTNode_RETURN(ASTnode result) {
+    public ASTNode_Return(ASTNode result) {
         super("RETURN", "return");
         this.result = result;
         CodeAndResult();
@@ -17,7 +17,7 @@ public class ASTNode_RETURN extends ASTnode {
         String varType;
         if(!consVar) {
             String current = generalUtils.getCurrentScope();
-            Symbol_FUCNTION func = (Symbol_FUCNTION) generalUtils.SymbolTable.get(current);
+            Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(current);
 
             //if var is operation
             boolean isOp = var.contains("-") || var.contains("+") || var.contains("*") || var.contains("/") ;
@@ -44,9 +44,9 @@ public class ASTNode_RETURN extends ASTnode {
 //            else opCode = ";STORES";
         }
 
-        String line = opCode + " "+temp+" $R";
-        addCodeToNode(line);
-        line = ";RET";
-        addCodeToNode(line);
+        code = opCode + " "+temp+" $R";
+        generalUtils.storeCode(code);
+        code = ";RET";
+        generalUtils.storeCode(code);
     }
 }

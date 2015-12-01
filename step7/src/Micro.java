@@ -59,6 +59,9 @@ public class Micro {
     public static void main(String[] args) throws Exception
     {
         //program will exit here if encounters any error, handled in my ErrorHandler
-        new Micro(args[0]);
+        Micro newTest = new Micro(args[0]);
+
+        //print symbol table
+        //newTest.wrapperScope.printSymbols();
     }
 }

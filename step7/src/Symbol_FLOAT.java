@@ -1,18 +1,18 @@
 /**
  * Created by jianruan on 9/20/15.
  */
-public class Symbol_FLOAT extends Symbol {
+public class Symbol_Float extends Symbol {
 
     private float value;
     private boolean isPara;
 
-    public Symbol_FLOAT(String name, Scope scope, boolean isPara)
+    public Symbol_Float(String name, Scope scope, boolean isPara)
     {
         super("FLOAT", name, scope);
         this.isPara =  isPara;
     }
 
-    public Symbol_FLOAT(String name, String value, Scope scope) {
+    public Symbol_Float(String name, String value, Scope scope) {
         super("FLOAT", name, scope);
         this.value = Float.valueOf(value);
     }

@@ -56,10 +56,8 @@ public class myASTbuilder extends MicroBaseListener {
         generalUtils.pushLabel(goToEnd_label);
 
         //step2, generate code for first Label
-//        String code4FirstLabel = ";LABEL " + backToFor_label;
-//        generalUtils.storeCode(code4FirstLabel);
-        ASTNode_FOR_Enter node = new ASTNode_FOR_Enter(backToFor_label);
-        generalUtils.execQueue.add(node);
+        String code4FirstLabel = ";LABEL " + backToFor_label;
+        generalUtils.storeCode(code4FirstLabel);
 
         //step3, generate code for cmp
         //generalUtils.setlabel4Cmp(goToEnd_label);
@@ -84,13 +82,10 @@ public class myASTbuilder extends MicroBaseListener {
         String goToEnd_label = generalUtils.popLabel();
         String backToFor_label = generalUtils.popLabel();
         //step3: generate code for labels
-//        String codeForJump = ";JUMP " + backToFor_label;
-//        generalUtils.storeCode(codeForJump);
-//        String codeForEndLoop = ";LABEL " + goToEnd_label;
-//        generalUtils.storeCode(codeForEndLoop);
-
-        ASTnode node = new ASTNode_FOR_Exit(backToFor_label,goToEnd_label);
-        generalUtils.execQueue.add(node);
+        String codeForJump = ";JUMP " + backToFor_label;
+        generalUtils.storeCode(codeForJump);
+        String codeForEndLoop = ";LABEL " + goToEnd_label;
+        generalUtils.storeCode(codeForEndLoop);
     }
 
     /** IF-ELSE Statement Generation*/
@@ -101,14 +96,12 @@ public class myASTbuilder extends MicroBaseListener {
         String endLabel = generalUtils.popLabel();
 
         //generate code for label to end, and add to code
-//        String codeToEnd = ";JUMP " + endLabel;
-//        generalUtils.storeCode(codeToEnd);
+        String codeToEnd = ";JUMP " + endLabel;
+        generalUtils.storeCode(codeToEnd);
         //generate code for label as ELSE, and add to code
-//        String codeAsElse = ";LABEL " + elseLabel;
-//        generalUtils.storeCode(codeAsElse);
+        String codeAsElse = ";LABEL " + elseLabel;
+        generalUtils.storeCode(codeAsElse);
 
-        ASTnode node =  new ASTNode_ELSE(endLabel,elseLabel);
-        generalUtils.execQueue.add(node);
 
         //push labels back
         generalUtils.pushLabel(endLabel);
@@ -123,12 +116,8 @@ public class myASTbuilder extends MicroBaseListener {
         String endLabel = generalUtils.popLabel();
 
         //only end will be used
-//        String codeForEndIF = ";LABEL " + endLabel;
-//        generalUtils.storeCode(codeForEndIF);
-
-        ASTnode node = new ASTNode_IF_Exit(endLabel);
-        generalUtils.execQueue.add(node);
-
+        String codeForEndIF = ";LABEL " + endLabel;
+        generalUtils.storeCode(codeForEndIF);
     }
 
 
@@ -165,6 +154,7 @@ public class myASTbuilder extends MicroBaseListener {
             if(!str.equals(",")) s.add(str);
             i++;
         }
+        //System.out.println();
         return s;
     }
 
@@ -175,6 +165,7 @@ public class myASTbuilder extends MicroBaseListener {
     }
 
     private void inOrderTraversal(ArrayList<String> tokens, ParseTree parent) {
+
         // Iterate over all child nodes of `parent`.
         for (int i = 0; i < parent.getChildCount(); i++) {
 
@@ -193,15 +184,14 @@ public class myASTbuilder extends MicroBaseListener {
         }
     }
 
+
     @Override public void enterFunc_body(MicroParser.Func_bodyContext ctx)
     {
         MicroParser.Func_declContext ct = (MicroParser.Func_declContext) ctx.getParent();
         String func_name = ct.id().getText();
         generalUtils.setCurrentScope(func_name);
-        ASTnode node = new ASTNode_FUNCTION_Pre(func_name);
-        generalUtils.execQueue.add(node);
-//        generalUtils.storeCode(";LABEL "+func_name);
-//        generalUtils.storeCode(";LINK");
+        generalUtils.storeCode(";LABEL "+func_name);
+        generalUtils.storeCode(";LINK");
     }
 
 

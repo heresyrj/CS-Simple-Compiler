@@ -22,4 +22,7 @@ public class IRnode {
     }
 
     public boolean addToOUT (int instruc) { return OUT.add(instruc);}
+
+    public HashSet<Integer> getOUT() {return OUT;}
+    public void clearIN() { IN.clear();}
 }

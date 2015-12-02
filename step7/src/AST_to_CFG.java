@@ -7,21 +7,44 @@ public class AST_to_CFG {
     //set to final to avoid any change
     //to preserve the order
     final private ArrayList<IRnode> nodes;
-    //private ArrayList<IRnode> leaderNodes; //--> turns out to be unnecessary once new mark filed is added to IRnode, preserve to debug
-    private HashMap<Integer, Integer> adjacency;
+    private ArrayList<IRnode> leaderNodes;
+    private HashMap<Integer, HashSet<Integer>> adjacency;
+    int entryPoint = -1;
 
     public AST_to_CFG (ArrayList<IRnode> nodes) {
         this.nodes = nodes;
-        //leaderNodes = new ArrayList<>();
+        leaderNodes = new ArrayList<>();
         //simply treat every single statement as a block
         adjacency = new HashMap<>();
         generateLeaders();
         generateInOut();
+        generateGraph();
     }
-    private boolean isCmp(String op) {
+
+    /***************************************** UTILITIES METHODS *************************************************/
+
+    private boolean isCmpNode(String op) {
         return op.contains("NE") || op.contains("EQ") || op.contains("GE") || op.contains("LE")
                 || op.contains("GT") || (op.contains("LT") && !op.contains("MUL"));
     }
+    private boolean isFuncEntryLabel(IRnode node) {
+        boolean isLabel = node.opCode.contains("LABEL");
+        boolean isFunc = false;
+        if(node.result != null) {
+            isFunc = !node.result.contains("label");
+        }
+
+        return isLabel&&isFunc;
+    }
+    private boolean isFuncRet(IRnode node) {
+        return node.opCode.contains("RET");
+    }
+    private boolean isLeader(IRnode node) {return leaderNodes.contains(node); }
+
+    /**************************************************************************************************************/
+
+
+
 
     private void generateLeaders () {
         ArrayList<Integer> leaders = new ArrayList<>();
@@ -40,7 +63,7 @@ public class AST_to_CFG {
             boolean cond2 = false;
             if (!cond0) {
                 cond1 = current.opCode.contains("LABEL");
-                cond2 = isCmp(previous.opCode);
+                cond2 = isCmpNode(previous.opCode);
             }
             if(cond0 || cond1 || cond2 ) { leaders.add(i);}
         }
@@ -50,52 +73,31 @@ public class AST_to_CFG {
         {
             IRnode node = nodes.get(index);
             node.isleader = true;
-            //leaderNodes.add(node);
+            leaderNodes.add(node);
         }
 
+        /** For debug **/
+        System.out.println("\nLeaders :");
+        for(IRnode node : nodes) {
+            if(node.isleader) {
+                System.out.println(nodes.indexOf(node)+1+": "+node.opCode +" "+ node.operand1 +" " + node.result);
+            }
+        }
     }
 
     private void generateInOut() {
-        /**
-         * check if all leaders are labeled in origNodes
-         * for debug
-         * **/
-//        System.out.println("\nLeaders :");
-//        for(IRnode node : nodes) {
-//            if(node.isleader) {
-//                System.out.println(nodes.indexOf(node)+1+": "+node.opCode +" "+ node.operand1 +" " + node.result);
-//            }
-//        }
 
-
-        /** Analysis for Function Calls.
-         * "JSR someFunc"---index i
-         *  IN = { i-1 } ---> only 1 element
-         *  OUT = { first leader node after "someFunc" label} --> only one element
-         *
-         *  and
-         *
-         *  for [ first leader node after "someFunc" label ]
-         *  IN = { i } --> may be multiple
-         *  OUT = { index of itself + 1 } --> only 1 elements
-         *
-         *  also
-         *
-         *  for [the RET node in the func ]
-         *  IN = { index of itself - 1 }
-         *  OUT = {i + 1};
-         * */
-
-        //find all labels
-        HashSet<String> labels = new HashSet<>();
+        /****************************************** Resources Data Structures *****************************************/
+        /** find all labels */
+        HashSet<String> labels = new HashSet<>();/** <--------------------------------------  Resources Data Structure*/
         for (IRnode node : nodes) {
             String op = node.opCode;
             if (op.equals("LABEL"))
                 labels.add(node.result);
         }
 
-        //find occurences of all labels
-        HashMap<String, HashSet<Integer>> labels2Indexes = new HashMap<>();
+        /** find occurrences of all labels */
+        HashMap<String, HashSet<Integer>> labels2Indexes = new HashMap<>();/** <------------  Resources Data Structure*/
         //for each label find all locations of it
         for (String label : labels)
         {
@@ -115,9 +117,23 @@ public class AST_to_CFG {
         }
 
         /** There are two passes, their operations may overlap, but it doesn't hurt */
-        int entryPoint = -1;
-        int exitPoint = -1;
-        HashSet<String> funcLabels = new HashSet<>();
+        HashSet<String> funcLabels = new HashSet<>(); /** <--------------------------------  Resources Data Structure*/
+
+        /** For each function, find the begin and end
+         *  add IN and OUT for inner nodes
+         *  then take care of begin and end nodes
+         *  in a case by case manner (main or regular func)
+         * **/
+        class FuncInfo {
+            int funcBegin;
+            HashSet<Integer> sources;
+            HashSet<Integer> funcRet = new HashSet<>();
+        }
+        HashMap<String, FuncInfo> funcMapping = new HashMap<>();/** <----------------------  Resources Data Structure*/
+
+        /**************************************************************************************************************/
+
+
 
         /** PASS 1: handle all the nodes involving labels **/
         //this pass takes care of function calls and explicit/implicit targets of conditional jump
@@ -144,56 +160,72 @@ public class AST_to_CFG {
                     //also need to add the RET to {IN} of those nodes-->case2
                     if(!label.contains("label"))//--> if function
                     {
-                        /**these lines below are ->Irrelevant<- to other operations in the outer most iteration
-                         * just to facilitate Pass 2 */
-                        /***/funcLabels.add(label);
-                        /***/if(label.equals("main")) { entryPoint = des;} //->store entryPoint
+                        /*************************************************************************************/
+                        /***/if(label.equals("main")) { entryPoint = des;} /**     ->store entryPoint
                         /*************************************************************************************/
 
-                        for(int addr_first_ret = des; ;addr_first_ret++) {
-                            IRnode firstRetNode= nodes.get(addr_first_ret);
-                            if(firstRetNode.opCode.contains("RET")) {
 
-                                /**this line is ->Irrelevant<- to other operations in the outer most iteration
-                                 * just to facilitate Pass 2 */
-                                /***/if(label.equals("main")) { exitPoint = addr_first_ret;} //-> store exitPoint
-                                /*****************************************************************************/
+                        /**step1:add to function labels set*/
+                        funcLabels.add(label);
+                        /**step2:initiate a mapping for it*/
+                        FuncInfo thisFunc = new FuncInfo();
+                        funcMapping.put(label, thisFunc);
+                        /**step3: get the beginning of a function*/
+                        thisFunc.funcBegin = nodes.indexOf(node);
+                        /**step4: add sources and begin of this functions*/
+                        thisFunc.sources = sources;
+                        /**step5: find the boundaries of this func and all of its RET*/
 
-                                for(int src : sources) {
-                                    //case1
-                                    firstRetNode.addToOUT(src+1);//+1 to get the following node
-                                    //case2
-                                    IRnode followingNode = nodes.get(src+1);
-                                    followingNode.addToIN(addr_first_ret);
-                                }
+                        int funcStart = thisFunc.funcBegin + 1;
+                        while(true) {
+                            IRnode needle = nodes.get(funcStart);
+                            //corner case: at the end end of nodes, there's no another func label
+                            if( funcStart == nodes.size() - 1 ) {
+                                thisFunc.funcRet.add(funcStart);
                                 break;
                             }
+                            if(isFuncEntryLabel(needle)){
+                                break;
+                            }
+                            if(isFuncRet(needle)) {
+                                thisFunc.funcRet.add(nodes.indexOf(needle));
+                            }
+                            funcStart++;
                         }
+
                     }
 
-                    /** For any destination node in general */
+                    /** NOTICE: if the label represents a function,
+                     *          then all of its info is built till this point**/
+
+                    /** For any destination node in general (INCLUDING functions)
+                     * 1. add source nodes to the {IN} of this label node
+                     * 2. add this label node to the {OUT} of all source nodes
+                     * 3. they are always a pair
+                     * */
                     IRnode des_node = nodes.get(des);
                     for (int source : sources) {
+                        //case like JSR JUMP are also taken care here
                         //add "sources" into {IN} of des node
+                        /** 1 */
                         des_node.addToIN(source);
-                        //add "des" into {OUT} of every source node
-                        IRnode source_node = nodes.get(source);
                         /** this line handles part of the sources OUTs
                          * all the source need add des as one of its {OUT}   <------------------------------
                          * but it's only OK for unconditional jump                                         |
                          * situations when source is conditional jumps handles below in "else" part        |
                          * */
+                        /** 2 */
+                        //add "des" into {OUT} of every source node
+                        IRnode source_node = nodes.get(source);
                         source_node.addToOUT(des); //---> explicit targets
                     }
-                        /**                                                                                |
-                         * */
                 }
                 else
                 {
                     /**                                                                                    |
                      * If occurrences are sources and conditional jumps *  <--------------------------------
                      */
-                    if(isCmp(node.opCode)) {
+                    if(isCmpNode(node.opCode)) {
                         //add follow node into {OUT} of cmp node
                         int indexOfCmp = nodes.indexOf(node);
                         node.addToOUT(indexOfCmp+1);//the following node of cmp node is implicit targets
@@ -207,68 +239,108 @@ public class AST_to_CFG {
             }
         }
 
-        /** PASS 2: handle all the nodes in general **/
 
-        /** Step 1: Validate entry point, aka "main" */
+        /** Validation: Validate entry point, aka "main" */
         if(entryPoint == -1) {
             System.out.println("main function is not set");
             System.exit(-1);
         }
-        //for debug
-        System.out.println("main is at line: " + (entryPoint+1) );
-        System.out.println("exit is at line: " + (exitPoint+1) );//---> not necessary is the last line
 
-        /** So far,
-         *  1. IN and OUT for all functions are taken cared
-         *  2. IN and OUT for other JUMPs are taken cared
-         *  3. Entry point for the program is Found
-         *
-         *  Need to do,
-         *  1. add IN and OUT for nodes within functions ---> all function labels are found
-         *  2. Particularly, IN for Label main is NULL
-         *                   OUT for the RET belongs to main is NULL
-         * */
-
-
-        /** For each function, find the begin and end
-         *  add IN and OUT for inner nodes
-         *  then take care of begin and end nodes
-         *  in a case by case manner (main or regular func)
-         * **/
-        int funcBegin = -1;
-        int funcEnd = -1;
+        /** For Debug */
+        System.out.println();
+        System.out.println("Program entry point is at line: " + (entryPoint+1) );
         for (String func : funcLabels) {
-
-            //get Begin and End point for current function
-            HashSet<Integer> occurs = labels2Indexes.get(func);
-            for(int occur :occurs) {
-                if (nodes.get(occur).opCode.contains("LABEL")) {
-                    funcBegin = occur;
-                    break;
-                }
+            FuncInfo thisFunc = funcMapping.get(func);
+            System.out.print("Function "+func+": Begins at "+(thisFunc.funcBegin+1)+" and RET(s) at ");
+            for(Integer index : thisFunc.funcRet) {
+                System.out.print((index+1)+" ");
             }
-            for(int addr_ret = funcBegin+1; ; addr_ret++) {
-                if(nodes.get(addr_ret).opCode.contains("RET")){
-                    funcEnd = addr_ret;
-                    /** WRONG!!!!!
-                     *  fail in recursive functions
-                     *  the RET right before next function label
-                     *  is the end point for the function
-                     *
-                     *  also, check previous steps see
-                     *  if IN and OUT of jumps are correct
-                     ***/
-                    break;
-                }
+            System.out.print("; And it's called from: ");
+            for(Integer index : thisFunc.sources) {
+                System.out.print((index+1)+" ");
             }
-
-            //for debug
-            System.out.println("Function "+func+": Begins at "+(funcBegin+1)+" and Ends at "+(funcEnd+1));
-
+            System.out.print("\n");
         }
 
 
+        /** PASS 2: handle all other cases in general **/
+        /** So far,
+         *  1. {IN} for Labels are taken cared
+         *  2. {OUT} for other JUMPs are taken cared
+         *  3. Entry point for the program is Found
+         *  4. Info of All Functions
+         * */
+
+        /** functions and funcMapping is built at this Point
+         * TODO:
+         *  1. take care IN and OUT for Enter & Exit of Functions
+         *  2. take care IN and OUT for regular nodes in between basic blocks
+         * */
+
+        /** step 1: connect Sources and Rets
+         *  By pairing RETs to the all the FollowNodes of all the sourceNodes
+         *  */
+        for(String func : funcLabels)
+        {
+            FuncInfo thisFunc = funcMapping.get(func);
+            for(Integer source : thisFunc.sources)
+            {
+                IRnode followNode = nodes.get(source + 1);
+                for (Integer ret : thisFunc.funcRet)
+                {
+                    //part1
+                    IRnode retNode = nodes.get(ret);
+                    retNode.addToOUT(source);
+                    //part2
+                    followNode.addToIN(source);
+                }
+            }
+        }
+
+        /** step 2: connect nodes in between Leaders */
+        for (IRnode leader : leaderNodes)
+        {
+            int needle =  nodes.indexOf(leader);
+            while(true) {
+                if(needle == nodes.size() - 1) break;
+
+                IRnode node1 = nodes.get(needle);
+                IRnode node2 = nodes.get(needle + 1);
+
+                //if the first node is RET
+                if(isFuncRet(node1)) break;
+
+
+                node1.addToOUT(needle + 1);
+                node2.addToIN(needle);
+                // node1(needle) --> increment
+                //   |
+                // node2(needle+1) -> increment
+                //   |
+                // until next leader
+                needle++;
+            }
+        }
+
     }
 
+    public void generateGraph() {
+        int index = 0;
+        for(IRnode node : nodes) {
+            HashSet<Integer> outs = node.getOUT();
+            adjacency.put(index, outs);
+            index++;
+        }
+
+        /** For Debug */
+        System.out.print("\n");
+        for(int i : adjacency.keySet()) {
+            System.out.print("Node "+(i+1)+" links to");
+            HashSet<Integer> links = adjacency.get(i);
+            if(links.isEmpty()) {System.out.print(" NULL");}
+            for(int j : links) {System.out.print(" "+(j+1));}
+            System.out.print("\n");
+        }
+    }
 
 }

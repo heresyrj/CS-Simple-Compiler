@@ -20,9 +20,9 @@ public class IRnode {
     public boolean addToIN(int instruc) {
         return IN.add(instruc);
     }
-
     public boolean addToOUT (int instruc) { return OUT.add(instruc);}
+    public void removeFromOUT (int instruc) {OUT.remove(instruc); }
 
-    public HashSet<Integer> getOUT() {return OUT;}
+    public HashSet<Integer> getOUT() { return OUT;}
     public void clearIN() { IN.clear();}
 }

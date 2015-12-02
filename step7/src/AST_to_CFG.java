@@ -40,6 +40,7 @@ public class AST_to_CFG {
         return node.opCode.contains("RET");
     }
     private boolean isLeader(IRnode node) {return leaderNodes.contains(node); }
+    private boolean isFuncCall(IRnode node) {return node.opCode.contains("JSR");}
 
     /**************************************************************************************************************/
 
@@ -239,7 +240,6 @@ public class AST_to_CFG {
             }
         }
 
-
         /** Validation: Validate entry point, aka "main" */
         if(entryPoint == -1) {
             System.out.println("main function is not set");
@@ -285,14 +285,15 @@ public class AST_to_CFG {
             FuncInfo thisFunc = funcMapping.get(func);
             for(Integer source : thisFunc.sources)
             {
+                int follow = source + 1;
                 IRnode followNode = nodes.get(source + 1);
                 for (Integer ret : thisFunc.funcRet)
                 {
                     //part1
                     IRnode retNode = nodes.get(ret);
-                    retNode.addToOUT(source);
+                    retNode.addToOUT(follow);
                     //part2
-                    followNode.addToIN(source);
+                    followNode.addToIN(ret);
                 }
             }
         }
@@ -310,18 +311,16 @@ public class AST_to_CFG {
                 //if the first node is RET
                 if(isFuncRet(node1)) break;
 
+                //when node1 is JSR xxx, it's unconditional jump
+                //don't add
+                if(!isFuncCall(node1)) {
+                    node1.addToOUT(needle + 1);
+                    node2.addToIN(needle);
+                }
 
-                node1.addToOUT(needle + 1);
-                node2.addToIN(needle);
-                // node1(needle) --> increment
-                //   |
-                // node2(needle+1) -> increment
-                //   |
-                // until next leader
                 needle++;
             }
         }
-
     }
 
     public void generateGraph() {

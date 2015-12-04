@@ -273,6 +273,7 @@ public class generalUtils {
         IRtoRawASM converter = new IRtoRawASM(codeAggregete);
         converter.buidIRnode();
         AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
+        DataFlow DF = new DataFlow(CFG);
 
         //converter.printTiny();
 

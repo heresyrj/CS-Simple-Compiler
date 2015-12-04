@@ -8,21 +8,49 @@ public class AST_to_CFG {
     //to preserve the order
     final private ArrayList<IRnode> nodes;
     private ArrayList<IRnode> leaderNodes;
+    private HashMap<Integer, HashSet<Integer>> reverseAdjacency;
     private HashMap<Integer, HashSet<Integer>> adjacency;
+    private HashSet<String> funcLabels;
+    private HashMap<String, FuncInfo> funcMapping;
     int entryPoint = -1;
+    int exitPoint = -1;
+
+    /** For each function, find the begin and end
+     *  add IN and OUT for inner nodes
+     *  then take care of begin and end nodes
+     *  in a case by case manner (main or regular func)
+     * **/
+    class FuncInfo {
+        int funcBegin;
+        HashSet<Integer> sources;
+        HashSet<Integer> funcRet = new HashSet<>();
+    }
 
     public AST_to_CFG (ArrayList<IRnode> nodes) {
         this.nodes = nodes;
         leaderNodes = new ArrayList<>();
         //simply treat every single statement as a block
+        reverseAdjacency = new HashMap<>();
         adjacency = new HashMap<>();
-        generateLeaders();
-        generateInOut();
-        generateGraph();
+        activateGeneration();
     }
 
-    /***************************************** UTILITIES METHODS *************************************************/
+    /***************************************** PUBLIC UTILITIES METHODS *******************************************/
+    public HashMap<Integer, HashSet<Integer>> getGraph () {return adjacency;}
+    public HashMap<Integer, HashSet<Integer>> getReverseGraph () {return reverseAdjacency;}
+    public ArrayList<IRnode> getNodesList() {return nodes;}
+    public HashSet<String> getAllFuncs() {return funcLabels;}
+    public int getFuncEnter(String func) {return funcMapping.get(func).funcBegin;}
+    public HashSet<Integer> getFuncExit(String func) {return funcMapping.get(func).funcRet;}
+    /**************************************************************************************************************/
 
+    /***************************************** CLASS UTILITIES METHODS ********************************************/
+    private void activateGeneration () {
+        generateLeaders();
+        generateInOut();
+        addMergeNode();
+        generateGraph();
+    }
     private boolean isCmpNode(String op) {
         return op.contains("NE") || op.contains("EQ") || op.contains("GE") || op.contains("LE")
                 || op.contains("GT") || (op.contains("LT") && !op.contains("MUL"));
@@ -36,15 +64,9 @@ public class AST_to_CFG {
 
         return isLabel&&isFunc;
     }
-    private boolean isFuncRet(IRnode node) {
-        return node.opCode.contains("RET");
-    }
-    private boolean isLeader(IRnode node) {return leaderNodes.contains(node); }
+    private boolean isFuncRet(IRnode node) { return node.opCode.contains("RET");}
     private boolean isFuncCall(IRnode node) {return node.opCode.contains("JSR");}
-
     /**************************************************************************************************************/
-
-
 
 
     private void generateLeaders () {
@@ -118,19 +140,9 @@ public class AST_to_CFG {
         }
 
         /** There are two passes, their operations may overlap, but it doesn't hurt */
-        HashSet<String> funcLabels = new HashSet<>(); /** <--------------------------------  Resources Data Structure*/
+        funcLabels = new HashSet<>(); /** <--------------------------------  Resources Data Structure*/
 
-        /** For each function, find the begin and end
-         *  add IN and OUT for inner nodes
-         *  then take care of begin and end nodes
-         *  in a case by case manner (main or regular func)
-         * **/
-        class FuncInfo {
-            int funcBegin;
-            HashSet<Integer> sources;
-            HashSet<Integer> funcRet = new HashSet<>();
-        }
-        HashMap<String, FuncInfo> funcMapping = new HashMap<>();/** <----------------------  Resources Data Structure*/
+        funcMapping = new HashMap<>();/** <----------------------  Resources Data Structure*/
 
         /**************************************************************************************************************/
 
@@ -208,17 +220,26 @@ public class AST_to_CFG {
                     for (int source : sources) {
                         //case like JSR JUMP are also taken care here
                         //add "sources" into {IN} of des node
-                        /** 1 */
-                        des_node.addToIN(source);
-                        /** this line handles part of the sources OUTs
-                         * all the source need add des as one of its {OUT}   <------------------------------
-                         * but it's only OK for unconditional jump                                         |
-                         * situations when source is conditional jumps handles below in "else" part        |
-                         * */
-                        /** 2 */
-                        //add "des" into {OUT} of every source node
-                        IRnode source_node = nodes.get(source);
-                        source_node.addToOUT(des); //---> explicit targets
+                        if(!nodes.get(source).opCode.contains("JSR")) {
+                            /** 1 */
+                            des_node.addToIN(source);
+                            /** this line handles part of the sources OUTs
+                             * all the source need add des as one of its {OUT}   <------------------------------
+                             * but it's only OK for unconditional jump                                         |
+                             * situations when source is conditional jumps handles below in "else" part        |
+                             * */
+                            /** 2 */
+                            //add "des" into {OUT} of every source node
+                            IRnode source_node = nodes.get(source);
+                            source_node.addToOUT(des); //---> explicit targets
+                        } else {
+                            //if it is JSR
+                            //make it a straight line through
+                            IRnode JSRnode = nodes.get(source);
+                            JSRnode.addToOUT(source+1);
+                            nodes.get(source+1).addToIN(source);
+                        }
+
                     }
                 }
                 else
@@ -240,11 +261,22 @@ public class AST_to_CFG {
             }
         }
 
-        /** Validation: Validate entry point, aka "main" */
+        /** Validation: Validate entry point, aka "main"
+         *  and Find the Exit point of the program */
         if(entryPoint == -1) {
             System.out.println("main function is not set");
             System.exit(-1);
+        } else {
+            String entryFuncName = nodes.get(entryPoint).result;
+            HashSet<Integer> Rets = funcMapping.get(entryFuncName).funcRet;
+            if(Rets.size() == 1)
+                for(int ret : Rets) exitPoint = ret;
+            else {
+                System.out.println("main function's RET is not set properly");
+                System.exit(-1);
+            }
         }
+
 
         /** For Debug */
         System.out.println();
@@ -277,28 +309,8 @@ public class AST_to_CFG {
          *  2. take care IN and OUT for regular nodes in between basic blocks
          * */
 
-        /** step 1: connect Sources and Rets
-         *  By pairing RETs to the all the FollowNodes of all the sourceNodes
-         *  */
-        for(String func : funcLabels)
-        {
-            FuncInfo thisFunc = funcMapping.get(func);
-            for(Integer source : thisFunc.sources)
-            {
-                int follow = source + 1;
-                IRnode followNode = nodes.get(source + 1);
-                for (Integer ret : thisFunc.funcRet)
-                {
-                    //part1
-                    IRnode retNode = nodes.get(ret);
-                    retNode.addToOUT(follow);
-                    //part2
-                    followNode.addToIN(ret);
-                }
-            }
-        }
 
-        /** step 2: connect nodes in between Leaders */
+        /** connect nodes in between Leaders */
         for (IRnode leader : leaderNodes)
         {
             int needle =  nodes.indexOf(leader);
@@ -321,25 +333,80 @@ public class AST_to_CFG {
                 needle++;
             }
         }
+
+
     }
 
-    public void generateGraph() {
+    private void addMergeNode() {
+        //find all the Nodes with IN's size > 1
+        int size = nodes.size();
+        int i = 0;
+        while(i < size)
+        {
+            IRnode node = nodes.get(i);
+
+            if(node.getINsize() > 1)
+            {
+                int indexOfThisNode = nodes.indexOf(node);
+                //step1 create merge node
+                HashSet<Integer> inForMergeNode = (HashSet<Integer>)node.getIN().clone();
+                int outForMergeNode = indexOfThisNode;
+                IRnode mergeNode = new IRnode(inForMergeNode, outForMergeNode);
+                //step2 insert mergeNode in nodes list
+                nodes.add(mergeNode);
+                //step3 link outgoing neighbours correctly
+                if(node.clearIN())
+                    node.addToIN(nodes.indexOf(mergeNode));
+                else {
+                    System.out.println("IN not cleared;");
+                    System.exit(-1);
+                }
+                mergeNode.addToOUT(indexOfThisNode);
+                //step4 link incoming neighbours correctly
+                HashSet<Integer> inComings = mergeNode.getIN();
+                for(int incoming : inComings)
+                {
+                    IRnode inNode = nodes.get(incoming);
+                    if(inNode.removeOUT(indexOfThisNode))
+                        inNode.addToOUT(nodes.indexOf(mergeNode));
+                    else {
+                        System.out.println("OUT not cleared;");
+                        System.exit(-1);
+                    }
+                }
+            }
+
+            i++;
+        }
+    }
+
+    private void generateGraph() {
         int index = 0;
         for(IRnode node : nodes) {
+            // 1
+            HashSet<Integer> ins = node.getIN();
+            reverseAdjacency.put(index, ins);
+            // 2
             HashSet<Integer> outs = node.getOUT();
             adjacency.put(index, outs);
             index++;
         }
 
-        /** For Debug */
+        /**************************** For Debug ******************************/
         System.out.print("\n");
         for(int i : adjacency.keySet()) {
-            System.out.print("Node "+(i+1)+" links to");
+            HashSet<Integer> from = reverseAdjacency.get(i);
+            if(from.isEmpty()) {System.out.print(" NULL");}
+            for(int j : from) {System.out.print(" "+(j+1));}
+
+            System.out.print(" into [Node "+(i+1)+"] links to");
+
             HashSet<Integer> links = adjacency.get(i);
             if(links.isEmpty()) {System.out.print(" NULL");}
             for(int j : links) {System.out.print(" "+(j+1));}
             System.out.print("\n");
         }
+        /**********************************************************************/
     }
 
 }

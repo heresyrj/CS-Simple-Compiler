@@ -88,8 +88,8 @@ public class DataFlow {
             }
         } else if (isRet(op)) {
             HashSet<String> retNodeSet = new HashSet<>();
-            for (String var : GeneralUtils.SymbolTable.keySet()) {
-                if (GeneralUtils.SymbolTable.get(var).sym_getParentScope().getName().equals("GLOBAL")) {
+            for (String var : generalUtils.SymbolTable.keySet()) {
+                if (generalUtils.SymbolTable.get(var).sym_getParentScope().getName().equals("GLOBAL")) {
                     if (!funcBoundaries.keySet().contains(var))
                         retNodeSet.add(var);
                 }
@@ -169,7 +169,7 @@ public class DataFlow {
     }
 
     public HashSet<String> addToSet(String s, HashSet<String> set) {
-        if (!(GeneralUtils.isInteger(s) || GeneralUtils.isFloat(s)))
+        if (!(generalUtils.isInteger(s) || generalUtils.isFloat(s)))
             set.add(s);
         return set;
     }

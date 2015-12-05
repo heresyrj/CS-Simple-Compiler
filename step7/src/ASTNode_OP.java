@@ -46,11 +46,11 @@ public class ASTNode_Op extends ASTNode {
                 break;
         }
         //System.out.println(code);
-        GeneralUtils.storeCode(code);
+        generalUtils.storeCode(code);
     }
 
     public String arithmCodeGen(String op) {
-        temp = GeneralUtils.generateGlobalName();
+        temp = generalUtils.generateGlobalName();
         code = ";"+determineOperator(op) + " " + leftNode.temp + " " +rightNode.temp + " " + temp;
         return code;
     }

@@ -5,7 +5,7 @@ import java.util.Stack;
 /**
  * Created by jianruan on 10/14/15.
  */
-public class GeneralUtils {
+public class generalUtils {
 
     protected static HashMap<String, HashMap> directoryLookup = new HashMap<>();
     protected static HashMap<String, Symbol> SymbolTable = new HashMap<>();
@@ -272,6 +272,7 @@ public class GeneralUtils {
         BuildIR converter = new BuildIR(codeAggregete);
         AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
         DataFlow DF = new DataFlow(CFG);
+        toTiny tiny = new toTiny(new regAllocToolkit());
     }
 
 }

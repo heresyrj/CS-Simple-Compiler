@@ -24,7 +24,7 @@ public class ASTNode_Call extends ASTNode {
             String currentValue = currentNode.temp;
             String part1 = ";" + determineOperator(currentNode);
             code = part1 + " " + currentValue;
-            GeneralUtils.storeCode(code);
+            generalUtils.storeCode(code);
         }
         //System.out.println(code);
 

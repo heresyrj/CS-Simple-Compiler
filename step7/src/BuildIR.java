@@ -6,8 +6,8 @@ import java.util.HashMap;
  */
 public class BuildIR {
     private ArrayList<String> IRcodes;
-    protected HashMap<String, Symbol> SymbolTable = GeneralUtils.SymbolTable;
-    protected HashMap<String, HashMap> directoryLookup = GeneralUtils.directoryLookup;
+    protected HashMap<String, Symbol> SymbolTable = generalUtils.SymbolTable;
+    protected HashMap<String, HashMap> directoryLookup = generalUtils.directoryLookup;
 
     public BuildIR(ArrayList<String> codeAggregete) {
         IRcodes = codeAggregete;

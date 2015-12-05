@@ -6,7 +6,7 @@ import java.util.HashSet;
 /**
  * Created by jianruan on 12/4/15.
  */
-public class registerAllocation {
+public class regAllocToolkit {
     /**
         For each tuple op A B C in a BB, do
         Rx = ensure(A)
@@ -33,7 +33,7 @@ public class registerAllocation {
         }
     }
 
-    public registerAllocation () {
+    public regAllocToolkit() {
         registerMapping =  new HashMap<>();
         initializeRegisters(4);
         currentNode = null;
@@ -49,6 +49,27 @@ public class registerAllocation {
         return node.getLiveIN().contains(var);
     }
 
+    @Nullable
+    private register chooseRegToFree(IRnode node) {
+        //given the node, we know its liveness
+        //also easily know it's successors and predecessors
+        HashSet<String> neededVars = node.getRequire();
+        for(register r : registerMapping.values())
+        {
+            if(!neededVars.contains(r.valueStored)) return r;
+        }
+        return null;
+    }
+    @Nullable
+    private register getAFreeRegister () {
+        for (register r : registerMapping.values()) {
+            if(!r.dirty) return r;
+        }
+        return null;
+    }
+
+    /** check lecture notes for the details of the functions below */
+
     private String ensure (String var) {
         //whenever this method is called
         //a register name has to be returned
@@ -56,7 +77,7 @@ public class registerAllocation {
         //if the value has been contained in one of the registers
         //return name of that register
         for (register r : registerMapping.values()) {
-            if(r.valueStored.equals("var") && !r.dirty) {
+            if(r.valueStored.equals(var)) {
                 return r.name;
             }
         }
@@ -70,32 +91,12 @@ public class registerAllocation {
         register reg = registerMapping.get(r);
         if (reg.dirty && isAlive(reg.valueStored, currentNode)) {
             /**generate store*/
-            String codeForStore = "move " + reg.name + " " + reg.valueStored;
+            tinyNode codeForStore = new tinyNode("move ", reg.name,reg.valueStored);
+            toTiny.nodeListTiny.add(codeForStore);
             /**insert the code**/
         }
         reg.valueStored = null;
         reg.dirty = false;
-
-    }
-
-    @Nullable
-    private register getAFreeRegister () {
-        for (register r : registerMapping.values()) {
-            if(!r.dirty) return r;
-        }
-        return null;
-    }
-
-    @Nullable
-    private register chooseRegToFree(IRnode node) {
-        //given the node, we know its liveness
-        //also easily know it's successors and predecessors
-        HashSet<String> neededVars = node.getRequire();
-        for(register r : registerMapping.values())
-        {
-            if(!neededVars.contains(r.valueStored)) return r;
-        }
-        return null;
     }
 
     private register allocate (String var) {
@@ -106,13 +107,15 @@ public class registerAllocation {
         register r = getAFreeRegister();
         if(r == null) {
             r = chooseRegToFree(currentNode);
+            assert r != null;
+            free(r.name);
         }
         //put value in the register object
-        assert r != null;
         r.valueStored = var;
         r.dirty = true;
         //load the var into this register
-        String loadNewValue = "move " + r.valueStored + " "+ r.name ;
+        tinyNode loadNewValue = new tinyNode("move ", r.valueStored, r.name);
+        toTiny.nodeListTiny.add(loadNewValue);
         return r;
     }
 

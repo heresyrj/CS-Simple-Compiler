@@ -19,7 +19,7 @@ public class ASTNode_Func extends ASTNode {
     }
     @Override
     public String getType() {
-        Symbol_Func fs = (Symbol_Func) GeneralUtils.SymbolTable.get(getValue());
+        Symbol_Func fs = (Symbol_Func) generalUtils.SymbolTable.get(getValue());
         return fs.getReturnType();
     }
 
@@ -27,34 +27,34 @@ public class ASTNode_Func extends ASTNode {
     public void CodeAndResult() {
 
         int numOfPara = paraMeters.size();
-        GeneralUtils.storeCode(";PUSH");
+        generalUtils.storeCode(";PUSH");
 
-        String scope = GeneralUtils.getCurrentScope();
+        String scope = generalUtils.getCurrentScope();
         for (String paraMeter : paraMeters) {
-            Symbol_Func func = (Symbol_Func) GeneralUtils.SymbolTable.get(scope);
+            Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(scope);
             String temporal = func.getFuncVarLabel(paraMeter);
-            GeneralUtils.storeCode(";PUSH " + temporal);
+            generalUtils.storeCode(";PUSH " + temporal);
         }
 
-        GeneralUtils.storeCode(";JSR "+ getValue());
+        generalUtils.storeCode(";JSR "+ getValue());
 
         for(int i = 0; i < numOfPara; i++) {
-            GeneralUtils.storeCode(";POP");
+            generalUtils.storeCode(";POP");
         }
 
         //generate a label for function return value
-        temp = GeneralUtils.generateGlobalName();
-        GeneralUtils.storeCode(";POP "+temp);
+        temp = generalUtils.generateGlobalName();
+        generalUtils.storeCode(";POP "+temp);
 
     }
 
     public void CodeAndResult2() {
-        GeneralUtils.storeCode(";PUSH");
-        GeneralUtils.storeCode(";PUSH " + node.temp);
-        GeneralUtils.storeCode(";JSR "+ getValue());
-        GeneralUtils.storeCode(";POP");
-        temp = GeneralUtils.generateGlobalName();
-        GeneralUtils.storeCode(";POP "+temp);
+        generalUtils.storeCode(";PUSH");
+        generalUtils.storeCode(";PUSH " + node.temp);
+        generalUtils.storeCode(";JSR "+ getValue());
+        generalUtils.storeCode(";POP");
+        temp = generalUtils.generateGlobalName();
+        generalUtils.storeCode(";POP "+temp);
     }
 
 }

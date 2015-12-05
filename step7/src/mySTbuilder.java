@@ -253,12 +253,12 @@ public class mySTbuilder extends MicroBaseListener {
         thisFunc.sym_setName(funcName);
         thisFunc.setReturnType(returnType);
 
-        //update the key of this function in SymbolTable defined in GeneralUtils
-        if(GeneralUtils.SymbolTable.containsKey("temp")) {
-            Symbol sym = GeneralUtils.SymbolTable.get("temp");
+        //update the key of this function in SymbolTable defined in generalUtils
+        if(generalUtils.SymbolTable.containsKey("temp")) {
+            Symbol sym = generalUtils.SymbolTable.get("temp");
             String name = sym.sym_getName();
-            GeneralUtils.SymbolTable.remove("temp");
-            GeneralUtils.addSymboltoTable(name, sym);
+            generalUtils.SymbolTable.remove("temp");
+            generalUtils.addSymboltoTable(name, sym);
         }
 
     }

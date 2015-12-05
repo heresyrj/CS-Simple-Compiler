@@ -22,7 +22,7 @@ public class ASTNode_Simple extends ASTNode {
     public void CodeAndResult() {
         //For simple Node the code is it self
         if(getType().equals("INT") || getType().equals("FLOAT")) {
-            temp = GeneralUtils.generateGlobalName();
+            temp = generalUtils.generateGlobalName();
             if(getType().equals("INT")) {
                 code = ";STOREI ";
             } else {
@@ -31,17 +31,17 @@ public class ASTNode_Simple extends ASTNode {
             code =  code + getValue() +" "+ temp;
             //System.out.println(code);
             String[] constVar = {getType(),temp};
-            GeneralUtils.constStack.push(constVar);
+            generalUtils.constStack.push(constVar);
 
-            GeneralUtils.storeCode(code);
+            generalUtils.storeCode(code);
         }
         else {
 
             if(belong == null || belong.equals("NOT")) temp = getValue();
             else {
                 String var = getValue();
-                String current = GeneralUtils.getCurrentScope();
-                Symbol_Func func = (Symbol_Func) GeneralUtils.SymbolTable.get(current);
+                String current = generalUtils.getCurrentScope();
+                Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(current);
                 temp = func.getFuncVarLabel(var);
             }
             code = null;

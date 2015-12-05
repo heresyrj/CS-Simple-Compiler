@@ -46,7 +46,7 @@ public class ASTNode_Cmp extends ASTNode {
                 break;
         }
         //System.out.println(code);
-        GeneralUtils.storeCode(code);
+        generalUtils.storeCode(code);
     }
 
     public String cmpCodeGen(String cmp) {

@@ -9,6 +9,7 @@ public class Symbol_Func extends Symbol {
     private String returnType;
     private HashMap<String, funcVar> locals;
 
+
     public Symbol_Func(String name, Scope parent) {
         super("FUNCTION", name, parent);
         funcScope = new Scope("FUNCTION", parent);
@@ -27,25 +28,35 @@ public class Symbol_Func extends Symbol {
     public String getFuncVarType(String var) {
         return locals.get(var).type;
     }
+    public int getNumOfLocals() {
+        int counter = 0;
+        for(funcVar var: locals.values()) {
+            //System.out.println(var.type +" "+var.label);
+            if(var.label.contains("L") && !var.type.contains("BLOCK")) {
+                counter++;
+            }
+        }
+        return counter;
+    }
 
     public void localSymbolTable () {
-        GeneralUtils.paraCounter = 1;
-        GeneralUtils.localCounter = 1;
+        generalUtils.paraCounter = 1;
+        generalUtils.localCounter = 1;
 
         for(Symbol s : funcScope.getSymbolList()) {
             String key = s.sym_getName();
             funcVar newVar = new funcVar();
             newVar.symbol = s;
-            newVar.type = GeneralUtils.getVarType(key);
+            newVar.type = generalUtils.getVarType(key);
             if(getLocalOrPara(key)) {
-                newVar.label = GeneralUtils.generateParaName();
+                newVar.label = generalUtils.generateParaName();
             } else {
-                newVar.label = GeneralUtils.generateLocalName();
+                newVar.label = generalUtils.generateLocalName();
             }
             locals.put(key, newVar);
         }
         String funcName = sym_getName();
-        GeneralUtils.directoryLookup.put(funcName, locals);
+        generalUtils.directoryLookup.put(funcName, locals);
     }
 
     public boolean isLocal (String var) {

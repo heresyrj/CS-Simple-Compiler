@@ -269,10 +269,10 @@ public class generalUtils {
         }
         //System.out.println(";tiny code");
 
-        BuildIR converter = new BuildIR(codeAggregete);
-        AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
+        BuildIR ir = new BuildIR(codeAggregete);
+        AST_to_CFG CFG = new AST_to_CFG(ir.getIRnodes());
         DataFlow DF = new DataFlow(CFG);
-        toTiny tiny = new toTiny(new regAllocToolkit());
+        toTiny tiny = new toTiny(new regAllocToolkit(), ir.getIRnodes());
     }
 
 }

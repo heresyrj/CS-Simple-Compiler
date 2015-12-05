@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * Created by jianruan on 12/2/15.
@@ -12,7 +11,6 @@ public class DataFlow {
     final private HashMap<Integer, HashSet<Integer>> adjacency;
     final private HashMap<Integer, HashSet<Integer>> reverseAdjacency;
     private HashMap<String, int[]> funcBoundaries;
-    private HashSet<IRnode> worklist;
 
     public DataFlow(AST_to_CFG CFG) {
         this.CFG = CFG;
@@ -65,7 +63,6 @@ public class DataFlow {
         return op.contains("MERGE");
     }
 
-
     private void initialization() {
         /** generate Require and Redefine var sets for each node */
         getFunctionInfo();
@@ -91,8 +88,8 @@ public class DataFlow {
             }
         } else if (isRet(op)) {
             HashSet<String> retNodeSet = new HashSet<>();
-            for (String var : generalUtils.SymbolTable.keySet()) {
-                if (generalUtils.SymbolTable.get(var).sym_getParentScope().getName().equals("GLOBAL")) {
+            for (String var : GeneralUtils.SymbolTable.keySet()) {
+                if (GeneralUtils.SymbolTable.get(var).sym_getParentScope().getName().equals("GLOBAL")) {
                     if (!funcBoundaries.keySet().contains(var))
                         retNodeSet.add(var);
                 }
@@ -172,24 +169,12 @@ public class DataFlow {
     }
 
     public HashSet<String> addToSet(String s, HashSet<String> set) {
-        if (!(generalUtils.isInteger(s) || generalUtils.isFloat(s)))
+        if (!(GeneralUtils.isInteger(s) || GeneralUtils.isFloat(s)))
             set.add(s);
         return set;
     }
 
-    private void buildWorklist(int nodeIndex) {
-
-        IRnode node = nodesList.get(nodeIndex);
-        worklist.add(node);
-
-        if (!getSuccessors(nodeIndex).isEmpty()) {
-            for (int index : getSuccessors(nodeIndex)) {
-                buildWorklist(index);
-            }
-        }
-    }
-
-    private void IOcalculation(IRnode node, HashSet<IRnode> worklist) {
+    private void IOcalculation(IRnode node, ArrayList<IRnode> worklist) {
         /** when calculate the liveness
          * MUST follow CGF path when proceed */
         //remove Node from the list
@@ -209,7 +194,7 @@ public class DataFlow {
             }
         }
         /** 2. IN = OUT + Require - Redefined */
-        HashSet<String> newIN = union(newOUT, node.getRequire());
+        HashSet<String> newIN = union(currentOUT, node.getRequire());
         newIN = subtract(newIN, node.getReDefine());
 
         if (!(newIN.containsAll(currentIN) && newOUT.containsAll(currentOUT) && currentIN.containsAll(newIN) && currentOUT.containsAll(newOUT))) {
@@ -228,23 +213,14 @@ public class DataFlow {
 
     private void livenessAnalysis() {
 
-        for (String func : funcBoundaries.keySet()) {
-            /**Step1: For each function, build its worklist following the graph path */
-            if (worklist != null) worklist.clear();
-            worklist = new HashSet<>();
-            int start = funcBoundaries.get(func)[0];
-            buildWorklist(start);
+        ArrayList<IRnode> worklist = (ArrayList<IRnode>) nodesList.clone();
 
-            /**Step2: start live-in lve-out calculation for each node */
-            Iterator iter = worklist.iterator();
-            while (iter.hasNext()) {
-                IOcalculation((IRnode) iter.next(), worklist);
-                iter = worklist.iterator();
-            }
+        while(!worklist.isEmpty()) {
+            IRnode node = worklist.remove(0);
+            IOcalculation(node, worklist);
         }
         debug();
     }
-
 
     private void debug() {
         for(IRnode thisNode: nodesList) {
@@ -255,12 +231,8 @@ public class DataFlow {
     }
 
     private void printNode(IRnode node) {
-        System.out.print("Node " + nodesList.indexOf(node) + " -> ");
 
-        for(int i : getSuccessors(nodesList.indexOf(node))) {
-            System.out.print(i+" ");
-        }
-
+        System.out.print("Node " + nodesList.indexOf(node));
         System.out.print("   [" + node.opCode + " ");
         if (node.operand1 != null)
             System.out.print(node.operand1 + " ");
@@ -287,12 +259,8 @@ public class DataFlow {
     }
 
     private void printNodeLiveness(IRnode node) {
-        System.out.print("live-in {");
-        for (String var : node.getLiveIN()) {
-            System.out.print(var + " ");
-        }
-        System.out.print("} ");
-        System.out.print("live-out {");
+
+        System.out.print("liveness {");
         for (String var : node.getLiveOUT()) {
             System.out.print(var + " ");
         }

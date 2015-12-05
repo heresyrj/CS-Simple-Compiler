@@ -12,12 +12,12 @@ public class ASTNode_Return extends ASTNode {
 
     public void CodeAndResult(){
         String var = result.getValue();
-        boolean consVar = generalUtils.isInteger(var) || generalUtils.isFloat(var) ;
+        boolean consVar = GeneralUtils.isInteger(var) || GeneralUtils.isFloat(var) ;
 
         String varType;
         if(!consVar) {
-            String current = generalUtils.getCurrentScope();
-            Symbol_Func func = (Symbol_Func) generalUtils.SymbolTable.get(current);
+            String current = GeneralUtils.getCurrentScope();
+            Symbol_Func func = (Symbol_Func) GeneralUtils.SymbolTable.get(current);
 
             //if var is operation
             boolean isOp = var.contains("-") || var.contains("+") || var.contains("*") || var.contains("/") ;
@@ -31,7 +31,7 @@ public class ASTNode_Return extends ASTNode {
             }
 
         } else {
-            String[] info = (generalUtils.getRecentConstVar());
+            String[] info = (GeneralUtils.getRecentConstVar());
             varType = info[0];
             temp = info[1];
         }
@@ -45,8 +45,8 @@ public class ASTNode_Return extends ASTNode {
         }
 
         code = opCode + " "+temp+" $R";
-        generalUtils.storeCode(code);
+        GeneralUtils.storeCode(code);
         code = ";RET";
-        generalUtils.storeCode(code);
+        GeneralUtils.storeCode(code);
     }
 }

@@ -48,7 +48,7 @@ public class Micro {
         //at this point, symbolTable is built, but there are symbols exist
         //as duplicates, Local symbols should only be affiliates of its parent scope
         //organizeSymbolTable will clean it up
-        generalUtils.organizeSymbolTable();
+        GeneralUtils.organizeSymbolTable();
 
         //PART F: the second pass throught the tree
         listener1 = new myASTbuilder();

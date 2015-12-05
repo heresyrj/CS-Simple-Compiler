@@ -29,23 +29,23 @@ public class Symbol_Func extends Symbol {
     }
 
     public void localSymbolTable () {
-        generalUtils.paraCounter = 1;
-        generalUtils.localCounter = 1;
+        GeneralUtils.paraCounter = 1;
+        GeneralUtils.localCounter = 1;
 
         for(Symbol s : funcScope.getSymbolList()) {
             String key = s.sym_getName();
             funcVar newVar = new funcVar();
             newVar.symbol = s;
-            newVar.type = generalUtils.getVarType(key);
+            newVar.type = GeneralUtils.getVarType(key);
             if(getLocalOrPara(key)) {
-                newVar.label = generalUtils.generateParaName();
+                newVar.label = GeneralUtils.generateParaName();
             } else {
-                newVar.label = generalUtils.generateLocalName();
+                newVar.label = GeneralUtils.generateLocalName();
             }
             locals.put(key, newVar);
         }
         String funcName = sym_getName();
-        generalUtils.directoryLookup.put(funcName, locals);
+        GeneralUtils.directoryLookup.put(funcName, locals);
     }
 
     public boolean isLocal (String var) {

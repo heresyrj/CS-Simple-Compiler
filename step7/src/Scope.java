@@ -46,7 +46,7 @@ public class Scope {
 
             /**also need to add to hastMap for later use
              also it's faster*/
-            generalUtils.addSymboltoTable(s.sym_getName(), s);
+            GeneralUtils.addSymboltoTable(s.sym_getName(), s);
         }
     }
 

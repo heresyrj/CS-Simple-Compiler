@@ -5,7 +5,7 @@ import java.util.Stack;
 /**
  * Created by jianruan on 10/14/15.
  */
-public class generalUtils {
+public class GeneralUtils {
 
     protected static HashMap<String, HashMap> directoryLookup = new HashMap<>();
     protected static HashMap<String, Symbol> SymbolTable = new HashMap<>();
@@ -171,7 +171,6 @@ public class generalUtils {
         codeAggregete.add(code);
     }
 
-
     /***********************************************************************
      * AST tree generation
      * */
@@ -270,13 +269,9 @@ public class generalUtils {
         }
         //System.out.println(";tiny code");
 
-        IRtoRawASM converter = new IRtoRawASM(codeAggregete);
-        converter.buidIRnode();
+        BuildIR converter = new BuildIR(codeAggregete);
         AST_to_CFG CFG = new AST_to_CFG(converter.getIRnodes());
         DataFlow DF = new DataFlow(CFG);
-
-        //converter.printTiny();
-
     }
 
 }

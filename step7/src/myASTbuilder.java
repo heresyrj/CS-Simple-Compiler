@@ -33,12 +33,12 @@ public class myASTbuilder extends MicroBaseListener {
     {
         //step1, generate two labels for for cmp,
         // 1 in cmp & as else. 1 at the end of else
-        String end_label = generalUtils.generateCodeLabel();
-        String else_label = generalUtils.generateCodeLabel();
-        generalUtils.pushLabel(end_label);
-        generalUtils.pushLabel(else_label);
+        String end_label = GeneralUtils.generateCodeLabel();
+        String else_label = GeneralUtils.generateCodeLabel();
+        GeneralUtils.pushLabel(end_label);
+        GeneralUtils.pushLabel(else_label);
         //step2 set proper label for cmp code
-        //generalUtils.setlabel4Cmp(else_label);
+        //GeneralUtils.setlabel4Cmp(else_label);
         //step3, generate code for cmp
         ArrayList<String> temp = getFlatTokenList(ctx);
         convertTokensToAST(temp);
@@ -49,18 +49,18 @@ public class myASTbuilder extends MicroBaseListener {
     {
         //step1, generate two labels for for cmp,
         // 1 before cmp, 1 in cmp
-        String backToFor_label = generalUtils.generateCodeLabel();
-        String goToEnd_label = generalUtils.generateCodeLabel();
+        String backToFor_label = GeneralUtils.generateCodeLabel();
+        String goToEnd_label = GeneralUtils.generateCodeLabel();
         //push to stack
-        generalUtils.pushLabel(backToFor_label);
-        generalUtils.pushLabel(goToEnd_label);
+        GeneralUtils.pushLabel(backToFor_label);
+        GeneralUtils.pushLabel(goToEnd_label);
 
         //step2, generate code for first Label
         String code4FirstLabel = ";LABEL " + backToFor_label;
-        generalUtils.storeCode(code4FirstLabel);
+        GeneralUtils.storeCode(code4FirstLabel);
 
         //step3, generate code for cmp
-        //generalUtils.setlabel4Cmp(goToEnd_label);
+        //GeneralUtils.setlabel4Cmp(goToEnd_label);
         ArrayList<String> temp = getFlatTokenList(ctx);
         convertTokensToAST(temp);
     }
@@ -79,45 +79,45 @@ public class myASTbuilder extends MicroBaseListener {
         ArrayList<String> temp = getFlatTokenList(ctx.incr_stmt());
         convertTokensToAST(temp);
         //step2:pop out labels from stack with reverse order
-        String goToEnd_label = generalUtils.popLabel();
-        String backToFor_label = generalUtils.popLabel();
+        String goToEnd_label = GeneralUtils.popLabel();
+        String backToFor_label = GeneralUtils.popLabel();
         //step3: generate code for labels
         String codeForJump = ";JUMP " + backToFor_label;
-        generalUtils.storeCode(codeForJump);
+        GeneralUtils.storeCode(codeForJump);
         String codeForEndLoop = ";LABEL " + goToEnd_label;
-        generalUtils.storeCode(codeForEndLoop);
+        GeneralUtils.storeCode(codeForEndLoop);
     }
 
     /** IF-ELSE Statement Generation*/
     //private boolean elseExists = false;
     @Override public void enterElse_part(MicroParser.Else_partContext ctx)
     {
-        String elseLabel = generalUtils.popLabel();
-        String endLabel = generalUtils.popLabel();
+        String elseLabel = GeneralUtils.popLabel();
+        String endLabel = GeneralUtils.popLabel();
 
         //generate code for label to end, and add to code
         String codeToEnd = ";JUMP " + endLabel;
-        generalUtils.storeCode(codeToEnd);
+        GeneralUtils.storeCode(codeToEnd);
         //generate code for label as ELSE, and add to code
         String codeAsElse = ";LABEL " + elseLabel;
-        generalUtils.storeCode(codeAsElse);
+        GeneralUtils.storeCode(codeAsElse);
 
 
         //push labels back
-        generalUtils.pushLabel(endLabel);
-        generalUtils.pushLabel(elseLabel);
+        GeneralUtils.pushLabel(endLabel);
+        GeneralUtils.pushLabel(elseLabel);
 
     }
 
     @Override public void exitIf_stmt(MicroParser.If_stmtContext ctx)
     {
         //pop to clear labels used for this if-else clause
-        String elseLabel = generalUtils.popLabel();
-        String endLabel = generalUtils.popLabel();
+        String elseLabel = GeneralUtils.popLabel();
+        String endLabel = GeneralUtils.popLabel();
 
         //only end will be used
         String codeForEndIF = ";LABEL " + endLabel;
-        generalUtils.storeCode(codeForEndIF);
+        GeneralUtils.storeCode(codeForEndIF);
     }
 
 
@@ -143,7 +143,7 @@ public class myASTbuilder extends MicroBaseListener {
         tokens = postOrderConverter.infixToRPN(tokens);
         ArrayList<String> result = handleTokens(tokens);
         /**generateAST*/
-        generalUtils.ASTgenerator(result);
+        GeneralUtils.ASTgenerator(result);
     }
 
     public ArrayList<String> handleTokens(String[] tokens) {
@@ -189,9 +189,9 @@ public class myASTbuilder extends MicroBaseListener {
     {
         MicroParser.Func_declContext ct = (MicroParser.Func_declContext) ctx.getParent();
         String func_name = ct.id().getText();
-        generalUtils.setCurrentScope(func_name);
-        generalUtils.storeCode(";LABEL "+func_name);
-        generalUtils.storeCode(";LINK");
+        GeneralUtils.setCurrentScope(func_name);
+        GeneralUtils.storeCode(";LABEL "+func_name);
+        GeneralUtils.storeCode(";LINK");
     }
 
 
@@ -199,7 +199,7 @@ public class myASTbuilder extends MicroBaseListener {
     public void exitProgram(MicroParser.ProgramContext programContext)
     {
         //print IR
-        generalUtils.compile();
+        GeneralUtils.compile();
     }
 
 }

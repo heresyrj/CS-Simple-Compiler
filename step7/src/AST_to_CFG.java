@@ -48,7 +48,7 @@ public class AST_to_CFG {
     private void activateGeneration () {
         generateLeaders();
         generateInOut();
-        addMergeNode();
+        //addMergeNode();
         generateGraph();
     }
     private boolean isCmpNode(String op) {

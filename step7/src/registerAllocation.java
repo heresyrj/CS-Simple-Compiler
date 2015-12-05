@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -33,11 +35,11 @@ public class registerAllocation {
 
     public registerAllocation () {
         registerMapping =  new HashMap<>();
-        intializeRegisters(4);
+        initializeRegisters(4);
         currentNode = null;
     }
 
-    private void intializeRegisters (int num) {
+    private void initializeRegisters (int num) {
         for(int i = 0; i < num; i++) {
             registerMapping.put(("r"+i), new register("r"+i));
         }
@@ -48,55 +50,70 @@ public class registerAllocation {
     }
 
     private String ensure (String var) {
+        //whenever this method is called
+        //a register name has to be returned
+
+        //if the value has been contained in one of the registers
+        //return name of that register
         for (register r : registerMapping.values()) {
             if(r.valueStored.equals("var") && !r.dirty) {
                 return r.name;
             }
         }
-
-        String reg = allocate(var);
-
-        /**generate load from opr into r*/
-
-        return reg;
+        //otherwise, allocate a register to the var
+        register reg = allocate(var);
+        //return the register name
+        return reg.name;
     }
 
     private void free (String r) {
         register reg = registerMapping.get(r);
         if (reg.dirty && isAlive(reg.valueStored, currentNode)) {
             /**generate store*/
+            String codeForStore = "move " + reg.name + " " + reg.valueStored;
+            /**insert the code**/
         }
-        else {
-            reg.dirty = false;
-        }
+        reg.valueStored = null;
+        reg.dirty = false;
+
     }
 
+    @Nullable
     private register getAFreeRegister () {
         for (register r : registerMapping.values()) {
-            if(!r.dirty) {
-                return r;
-            }
+            if(!r.dirty) return r;
         }
         return null;
     }
 
+    @Nullable
     private register chooseRegToFree(IRnode node) {
+        //given the node, we know its liveness
+        //also easily know it's successors and predecessors
         HashSet<String> neededVars = node.getRequire();
-        for(register r : registerMapping.values()) {
-            if(!neededVars.contains(r.valueStored))
-                return r;
+        for(register r : registerMapping.values())
+        {
+            if(!neededVars.contains(r.valueStored)) return r;
         }
         return null;
     }
 
-    private String allocate (String var) {
+    private register allocate (String var) {
+        //to get a register
+
+        //if there's free register
+        //pick any of them
         register r = getAFreeRegister();
         if(r == null) {
             r = chooseRegToFree(currentNode);
         }
+        //put value in the register object
+        assert r != null;
         r.valueStored = var;
-        return r.name;
+        r.dirty = true;
+        //load the var into this register
+        String loadNewValue = "move " + r.valueStored + " "+ r.name ;
+        return r;
     }
-
 
 }

@@ -3,13 +3,11 @@ BEGIN
 
 	INT i, j;
 	FLOAT newapprox,approx,num;
-	STRING eol := "\n";
 
 	FUNCTION VOID main()
 	BEGIN
 	
---		num := 7.0;			
-        READ(num);
+		num := 7.0;			
 		j := 1;
 		approx := num;	
 	
@@ -18,6 +16,6 @@ BEGIN
 			approx := newapprox;
         ROF
         
-		WRITE(approx, eol);
+		WRITE(approx);
 	END
 END

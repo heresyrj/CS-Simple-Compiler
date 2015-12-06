@@ -18,7 +18,6 @@ public class IRnode {
     private HashSet<String> liveIN;
     private HashSet<String> liveOUT;
 
-
     public IRnode () {
         IN = new HashSet<>();
         OUT = new HashSet<>();

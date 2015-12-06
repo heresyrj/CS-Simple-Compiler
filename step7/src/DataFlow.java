@@ -20,8 +20,9 @@ public class DataFlow {
         funcBoundaries = new HashMap<>();
         initialization();
         livenessAnalysis();
+        //debug();
     }
-
+    public HashMap<String, int[]> getFuncBoundaries () {return funcBoundaries;}
     private boolean isCmp(String op) {
         return op.contains("NE") || op.contains("EQ") || (op.contains("GE")&&!op.contains("MERGE")) || op.contains("LE")
                 || op.contains("GT") || (op.contains("LT") && !op.contains("MUL"));
@@ -219,7 +220,7 @@ public class DataFlow {
             IRnode node = worklist.remove(0);
             IOcalculation(node, worklist);
         }
-        debug();
+
     }
 
     private void debug() {

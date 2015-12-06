@@ -5,7 +5,7 @@ BEGIN
 	STRING second := "Please enter the second float number: ";
 	STRING third := "Please enter the third float number: ";
 	STRING eol := "\n";
-    STRING star := "*";
+     STRING star := "*";
 	STRING plus := "+";
 	STRING equal := "=";
 	

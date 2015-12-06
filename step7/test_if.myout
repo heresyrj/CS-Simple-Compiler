@@ -1,0 +1,78 @@
+;LABEL main
+;LINK
+;STOREI 7 $T1
+;STOREI $T1 num
+;STOREI 2 $T2
+;STOREI $T2 i
+;STOREI 42 $T3
+;STOREI $T3 a
+;STOREI 5 $T4
+;GE i $T4 label2
+;ADDI num a $T5
+;STOREI $T5 num
+;STOREI 3 $T6
+;GE i $T6 label4
+;ADDI num a $T7
+;STOREI $T7 num
+;JUMP label3
+;LABEL label4
+;LABEL label3
+;JUMP label1
+;LABEL label2
+;STOREI 5 $T8
+;LT i $T8 label6
+;SUBI num a $T9
+;STOREI $T9 num
+;JUMP label5
+;LABEL label6
+;LABEL label5
+;LABEL label1
+;WRITEI num
+;tiny code
+var a 
+var num 
+var i 
+push  
+push r0 
+push r1 
+push r2 
+push r3 
+jsr main 
+sys halt 
+label main 
+link 0 
+move 7 r2
+move r2 num
+move 2 r2
+move r2 i
+move 42 r2
+move r2 a
+move 5 r2
+cmpr i r2
+jge label2 
+move num r2
+addi a r2
+move r2 num
+move 3 r2
+cmpr i r2
+jge label4 
+move num r2
+addi a r2
+move r2 num
+jmp label3 
+label label4 
+label label3 
+jmp label1 
+label label2 
+move 5 r2
+cmpr i r2
+jlt label6 
+move num r2
+subi a r2
+move r2 num
+jmp label5 
+label label6 
+label label5 
+label label1 
+sys writei num
+end

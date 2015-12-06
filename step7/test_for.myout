@@ -1,0 +1,69 @@
+;LABEL main
+;LINK
+;STOREF 7.0 $T1
+;STOREF $T1 num
+;STOREI 1 $T2
+;STOREI $T2 j
+;STOREF num approx
+;STOREI 100 $T3
+;STOREI $T3 i
+;LABEL label1
+;STOREI 0 $T4
+;EQ i $T4 label2
+;STOREF 0.5 $T5
+;DIVF num approx $T6
+;ADDF approx $T6 $T7
+;MULTF $T5 $T7 $T8
+;STOREF $T8 newapprox
+;STOREF newapprox approx
+;STOREI 1 $T9
+;SUBI i $T9 $T10
+;STOREI $T10 i
+;JUMP label1
+;LABEL label2
+;WRITEF approx
+;tiny code
+var newapprox 
+var num 
+var i 
+var j 
+var approx 
+push  
+push r0 
+push r1 
+push r2 
+push r3 
+jsr main 
+sys halt 
+label main 
+link 0 
+move 7.0 r2
+move r2 num
+move 1 r2
+move r2 j
+move num r2
+move r2 approx
+move 100 r2
+move r2 i
+label label1 
+move 0 r2
+cmpr i r2
+jeq label2 
+move 0.5 r2
+move num r2
+divr approx r2
+move approx r3
+addr r2 r3
+move r2 r0
+mulr r3 r0
+move r2 newapprox
+move newapprox r2
+move r2 approx
+move 1 r2
+move i r3
+subi r2 r3
+move r2 i
+jmp label1 
+label label2 
+sys writer approx
+end

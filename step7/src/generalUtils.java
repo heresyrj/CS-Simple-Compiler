@@ -134,7 +134,6 @@ public class generalUtils {
     public static void setCurrentScope(String s) {
         pastScope = currentScope;
         currentScope = s;
-        varCounter = 1;
 
         //some fucntions doesn't explicitly return when finish
         //need to add it.
@@ -269,10 +268,10 @@ public class generalUtils {
         }
         //System.out.println(";tiny code");
 
-        BuildIR ir = new BuildIR(codeAggregete);
-        AST_to_CFG CFG = new AST_to_CFG(ir.getIRnodes());
+        BuildIR IR = new BuildIR(codeAggregete);
+        AST_to_CFG CFG = new AST_to_CFG(IR.getIRnodes());
         DataFlow DF = new DataFlow(CFG);
-        toTiny tiny = new toTiny(new regAllocToolkit(), ir.getIRnodes());
+        toTiny tiny = new toTiny(new regAllocToolkit(), IR.getIRnodes(), DF.getFuncBoundaries());
     }
 
 }

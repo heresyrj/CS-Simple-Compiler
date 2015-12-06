@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -7,18 +5,7 @@ import java.util.HashSet;
  * Created by jianruan on 12/4/15.
  */
 public class regAllocToolkit {
-    /**
-        For each tuple op A B C in a BB, do
-        Rx = ensure(A)
-        Ry = ensure(B)
-        if A dead after this tuple, free(Rx)
-        if B dead after this tuple, free(Ry)
-        Rz = allocate(C) //could use Rx or Ry
-        generate code for op
-        mark Rz dirty
-        At end of BB, for each dirty register
-        generate code to store register into appropriate variable
-     */
+
     private HashMap<String, register> registerMapping;
     private IRnode currentNode;
 
@@ -45,11 +32,17 @@ public class regAllocToolkit {
         }
     }
 
+    public void setCurrentNode(IRnode node) {currentNode = node;}
+
     private boolean isAlive(String var, IRnode node) {
-        return node.getLiveIN().contains(var);
+        if(node.getOUT() != null) {
+            return node.getLiveOUT().contains(var);
+        } else {
+            return false;
+        }
+
     }
 
-    @Nullable
     private register chooseRegToFree(IRnode node) {
         //given the node, we know its liveness
         //also easily know it's successors and predecessors
@@ -60,7 +53,7 @@ public class regAllocToolkit {
         }
         return null;
     }
-    @Nullable
+
     private register getAFreeRegister () {
         for (register r : registerMapping.values()) {
             if(!r.dirty) return r;
@@ -70,15 +63,21 @@ public class regAllocToolkit {
 
     /** check lecture notes for the details of the functions below */
 
-    private String ensure (String var) {
+    public String ensure (String var) {
         //whenever this method is called
         //a register name has to be returned
 
         //if the value has been contained in one of the registers
         //return name of that register
         for (register r : registerMapping.values()) {
-            if(r.valueStored.equals(var)) {
+            if(r.valueStored == null) {
+                r.valueStored = var;
+                r.dirty = true;
                 return r.name;
+            } else {
+                if(r.valueStored.equals(var)) {
+                    return r.name;
+                }
             }
         }
         //otherwise, allocate a register to the var
@@ -87,7 +86,7 @@ public class regAllocToolkit {
         return reg.name;
     }
 
-    private void free (String r) {
+    public void free (String r) {
         register reg = registerMapping.get(r);
         if (reg.dirty && isAlive(reg.valueStored, currentNode)) {
             /**generate store*/
@@ -114,9 +113,32 @@ public class regAllocToolkit {
         r.valueStored = var;
         r.dirty = true;
         //load the var into this register
-        tinyNode loadNewValue = new tinyNode("move ", r.valueStored, r.name);
+        tinyNode loadNewValue = new tinyNode("move", r.valueStored, r.name);
         toTiny.nodeListTiny.add(loadNewValue);
         return r;
+    }
+
+
+    public void saveAndReset(HashSet<String> globals) {
+        for (register r : registerMapping.values()) {
+
+            if(globals.contains(r.valueStored) && r.dirty) {
+                toTiny.nodeListTiny.add(new tinyNode("move", r.name, r.valueStored));
+            }
+
+            r.valueStored = null;
+            r.dirty = false;
+        }
+    }
+    public void freeDead(IRnode node) {
+
+        for (register r : registerMapping.values()) {
+            if(r.valueStored != null) {
+                if(!node.getLiveOUT().contains(r.valueStored)){
+                    free(r.name);
+                }
+            }
+        }
     }
 
 }

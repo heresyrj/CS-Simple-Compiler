@@ -3,13 +3,11 @@ BEGIN
 
 	INT count,enough;
 	FLOAT newapprox,approx,num,tolerance,diff;
-	STRING eol := "\n";
-	STRING space := " ";
+	
 	FUNCTION VOID main()
 	BEGIN	
 		tolerance := 0.0001;
---		num	:= 7.0;
-        READ(num);
+		num	:= 7.0;
 	
 		approx	:= num;
 		count 	:= 0;	
@@ -35,7 +33,7 @@ BEGIN
 
 		ROF
 		
-		WRITE(approx, space);
-		WRITE(count, eol);
+		WRITE(approx);
+		WRITE(count);
 	END
 END

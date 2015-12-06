@@ -100,12 +100,12 @@ public class AST_to_CFG {
         }
 
         /** For debug **/
-        System.out.println("\nLeaders :");
-        for(IRnode node : nodes) {
-            if(node.isleader) {
-                System.out.println(nodes.indexOf(node)+1+": "+node.opCode +" "+ node.operand1 +" " + node.result);
-            }
-        }
+//        System.out.println("\nLeaders :");
+//        for(IRnode node : nodes) {
+//            if(node.isleader) {
+//                System.out.println(nodes.indexOf(node)+1+": "+node.opCode +" "+ node.operand1 +" " + node.result);
+//            }
+//        }
     }
 
     private void generateInOut() {
@@ -279,20 +279,20 @@ public class AST_to_CFG {
 
 
         /** For Debug */
-        System.out.println();
-        System.out.println("Program entry point is at line: " + (entryPoint+1) );
-        for (String func : funcLabels) {
-            FuncInfo thisFunc = funcMapping.get(func);
-            System.out.print("Function "+func+": Begins at "+(thisFunc.funcBegin+1)+" and RET(s) at ");
-            for(Integer index : thisFunc.funcRet) {
-                System.out.print((index+1)+" ");
-            }
-            System.out.print("; And it's called from: ");
-            for(Integer index : thisFunc.sources) {
-                System.out.print((index+1)+" ");
-            }
-            System.out.print("\n");
-        }
+//        System.out.println();
+//        System.out.println("Program entry point is at line: " + (entryPoint+1) );
+//        for (String func : funcLabels) {
+//            FuncInfo thisFunc = funcMapping.get(func);
+//            System.out.print("Function "+func+": Begins at "+(thisFunc.funcBegin+1)+" and RET(s) at ");
+//            for(Integer index : thisFunc.funcRet) {
+//                System.out.print((index+1)+" ");
+//            }
+//            System.out.print("; And it's called from: ");
+//            for(Integer index : thisFunc.sources) {
+//                System.out.print((index+1)+" ");
+//            }
+//            System.out.print("\n");
+//        }
 
 
         /** PASS 2: handle all other cases in general **/
@@ -393,19 +393,19 @@ public class AST_to_CFG {
         }
 
         /**************************** For Debug ******************************/
-        System.out.print("\n");
-        for(int i : adjacency.keySet()) {
-            HashSet<Integer> from = reverseAdjacency.get(i);
-            if(from.isEmpty()) {System.out.print(" NULL");}
-            for(int j : from) {System.out.print(" "+(j+1));}
-
-            System.out.print(" into [Node "+(i+1)+"] links to");
-
-            HashSet<Integer> links = adjacency.get(i);
-            if(links.isEmpty()) {System.out.print(" NULL");}
-            for(int j : links) {System.out.print(" "+(j+1));}
-            System.out.print("\n");
-        }
+//        System.out.print("\n");
+//        for(int i : adjacency.keySet()) {
+//            HashSet<Integer> from = reverseAdjacency.get(i);
+//            if(from.isEmpty()) {System.out.print(" NULL");}
+//            for(int j : from) {System.out.print(" "+(j+1));}
+//
+//            System.out.print(" into [Node "+(i+1)+"] links to");
+//
+//            HashSet<Integer> links = adjacency.get(i);
+//            if(links.isEmpty()) {System.out.print(" NULL");}
+//            for(int j : links) {System.out.print(" "+(j+1));}
+//            System.out.print("\n");
+//        }
         /**********************************************************************/
     }
 

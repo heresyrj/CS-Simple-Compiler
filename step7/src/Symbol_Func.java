@@ -8,6 +8,7 @@ public class Symbol_Func extends Symbol {
     private Scope funcScope;
     private String returnType;
     private HashMap<String, funcVar> locals;
+    int spaceNeeded;
 
 
     public Symbol_Func(String name, Scope parent) {
@@ -33,6 +34,16 @@ public class Symbol_Func extends Symbol {
         for(funcVar var: locals.values()) {
             //System.out.println(var.type +" "+var.label);
             if(var.label.contains("L") && !var.type.contains("BLOCK")) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+    public int getNumOfParas() {
+        int counter = 0;
+        for(funcVar var: locals.values()) {
+            //System.out.println(var.type +" "+var.label);
+            if(var.label.contains("P") && !var.type.contains("BLOCK")) {
                 counter++;
             }
         }

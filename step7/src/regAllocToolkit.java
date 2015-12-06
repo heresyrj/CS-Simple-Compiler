@@ -87,7 +87,8 @@ public class regAllocToolkit {
         //return name of that register
         for (register r : registerMapping.values()) {
             if(r.valueStored == null) {
-                System.out.println(r.name +" is used to store " + var);
+                //for debug
+                //System.out.println(r.name +" is used to store " + var);
                 r.valueStored = var;
                 r.dirty = true;
                 return r.name;
@@ -148,24 +149,26 @@ public class regAllocToolkit {
         }
     }
     public void freeDead(IRnode node) {
+        //printouts are for debug
+
         HashSet<String> liveness = node.getLiveOUT();
-        System.out.print("[ ");
-        for(String var : liveness) {
-            System.out.print(var+" ");
-        }
-        System.out.print(" ] are live out;\n");
+//        System.out.print("[ ");
+//        for(String var : liveness) {
+//            System.out.print(var+" ");
+//        }
+//        System.out.print(" ] are live out;\n");
 
         for (register r : registerMapping.values()) {
-            System.out.print(r.name + " value:" + r.valueStored+" ");
+            //System.out.print(r.name + " value:" + r.valueStored+" ");
             if(r.valueStored != null) {
                 if(!liveness.contains(r.valueStored)){
                     free(r.name);
-                    System.out.print("; "+r.name+" is freed; ");
+                    //System.out.print("; "+r.name+" is freed; ");
                 }
             }
 
         }
-        System.out.println();
+        //System.out.println();
     }
 
 }

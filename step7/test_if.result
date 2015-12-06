@@ -1,12 +1,18 @@
+error on line 54 : illegal int stack reference
+error on line 54 : illegal float stack reference
+error on line 58 : illegal int stack reference
+error on line 58 : illegal float stack reference
+error on line 62 : illegal int stack reference
+error on line 62 : illegal float stack reference
 91
 STATISTICS _____________________________
-   #Instructions:28
-    (move-ops mem:7, reglit:10)
-    ( int-ops mem:3, reglit:6)
+   #Instructions:34
+    (move-ops mem:7, reglit:13)
+    ( int-ops mem:3, reglit:9)
     (  fp-ops mem:2, reglit:0)
-   Memory Usage (mem:12,reg:20)
-      register-use[1,1,17,1]
-   Total Cycles = 64
+   Memory Usage (mem:12,reg:23)
+      register-use[3,3,14,3]
+   Total Cycles = 70
 OTHER STATSvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     (int-ops:2, fp-ops:2)
     (branches:5)

@@ -100,34 +100,6 @@ public class toTiny {
         return op.contains("JSR");
     }
 
-    private String getCase(IRnode node) {
-        String op = node.opCode;
-        if(isCmp(op))  return "CM";
-        else if(isArithmatic(op)) return "AR";
-        else if(isLabel(op)) return "LB";
-        else if(isLink(op)) return "LK";
-        else if(isRet(op)) return "RT";
-        else if(isStore(op)) return "ST";
-        else if(isIO(op)) return "WR";
-        else if(isStackOP(op)) return "PP";
-        else if(isJump(op)) return "JP";
-        else if(isJSR(op)) return "JR";
-        else {
-            System.out.println("unrecognizable case num");
-            return "ER";
-        }
-    }
-
-    private String getCurrentFunc(IRnode node) {
-        int nodeIndex = IRnodes.indexOf(node);
-        for(String func : funcBoundaries.keySet()){
-            int[] boundry = funcBoundaries.get(func);
-            if(nodeIndex >= boundry[0] && nodeIndex <= boundry[1])
-                return func;
-        }
-        return "ERR";
-    }
-
     private void generateTinyNodes() {
 
         headerHandler();
@@ -171,16 +143,45 @@ public class toTiny {
         }
 
     }
+    private String getCase(IRnode node) {
+        String op = node.opCode;
+        if(isCmp(op))  return "CM";
+        else if(isArithmatic(op)) return "AR";
+        else if(isLabel(op)) return "LB";
+        else if(isLink(op)) return "LK";
+        else if(isRet(op)) return "RT";
+        else if(isStore(op)) return "ST";
+        else if(isIO(op)) return "WR";
+        else if(isStackOP(op)) return "PP";
+        else if(isJump(op)) return "JP";
+        else if(isJSR(op)) return "JR";
+        else {
+            System.out.println("unrecognizable case num");
+            return "ER";
+        }
+    }
+    private String getCurrentFunc(IRnode node) {
+        int nodeIndex = IRnodes.indexOf(node);
+        for(String func : funcBoundaries.keySet()){
+            int[] boundry = funcBoundaries.get(func);
+            if(nodeIndex >= boundry[0] && nodeIndex <= boundry[1])
+                return func;
+        }
+        return "ERR";
+    }
+
+
+
 
     private String getNameForVar(IRnode node, String operand) {
         String result;
         if(generalUtils.isInteger(operand) || generalUtils.isFloat(operand)) {
             result = operand;
+        } else if (toolkit.registerContains(operand)){
+            result = toolkit.returnRegisterName(operand);
         } else if(isGloabl(operand)) {
             result = operand;
-        } else if (findMapping.get(getCurrentFunc(node)).keySet().contains(operand)){
-            result = findMapping.get(getCurrentFunc(node)).get(operand);
-        } else {
+        }  else {
             result = toolkit.ensure(operand);
         }
 
@@ -238,18 +239,6 @@ public class toTiny {
         }
         return cmd;
     }
-
-    private void registerPush(){
-        for(int i = 0; i < 4; i++) {
-            toTiny.nodeListTiny.add(new tinyNode("push","r"+i,""));
-        }
-    }
-    private void registerPop() {
-        for(int i = 3; i >= 0; i--) {
-            toTiny.nodeListTiny.add(new tinyNode("pop","r"+i,""));
-        }
-    }
-
     private int numOfTemporals(String func) {
         int[] boundaries = funcBoundaries.get(func);
         HashSet<String> pool = new HashSet<>();
@@ -275,6 +264,16 @@ public class toTiny {
         return part1 + part2;
     }
 
+    private void registerPush(){
+        for(int i = 0; i < 4; i++) {
+            toTiny.nodeListTiny.add(new tinyNode("push","r"+i,""));
+        }
+    }
+    private void registerPop() {
+        for(int i = 3; i >= 0; i--) {
+            toTiny.nodeListTiny.add(new tinyNode("pop","r"+i,""));
+        }
+    }
 
 
     private void labelHandler(IRnode node) {
@@ -470,17 +469,34 @@ public class toTiny {
         String op = node.opCode;
         String cmd = getMathOpCode(op);
 
-
         String src1 = getNameForVar(node,node.operand1);
         String src2 = getNameForVar(node,node.operand2);
         String des = getNameForVar(node,node.result);
 
-        /** step1: move src1 to des */
-        nodeListTiny.add(new tinyNode("move",src2,des));
-        /** step2: compute */
-        nodeListTiny.add(new tinyNode(cmd,src1,des));
+        if(src1.contains("$") && src2.contains("$")) {
+            String extraReg = toolkit.ensure(src1);
+            nodeListTiny.add(new tinyNode("move", src1, extraReg));
+            nodeListTiny.add(new tinyNode(cmd, src2,extraReg));
+        } else if (isGloabl(src1) || isGloabl(src2)){
+            if(isGloabl(src1)) {
+                String extraReg = toolkit.ensure(src1);
+                nodeListTiny.add(new tinyNode("move", src1, extraReg));
+                src1 = extraReg;
+            }
+            if(isGloabl(src2)) {
+                String extraReg = toolkit.ensure(src2);
+                nodeListTiny.add(new tinyNode("move", src2, extraReg));
+                src2 = extraReg;
+            }
+            nodeListTiny.add(new tinyNode(cmd, src1,src2));
+        } else {
+            /** step1: move src1 to des */
+            nodeListTiny.add(new tinyNode("move",src2,des));
+            /** step2: compute */
+            nodeListTiny.add(new tinyNode(cmd,src1,des));
+        }
 
-        //toolkit.freeDead(node);
+        toolkit.freeDead(node);
     }
 
     public void printTiny() {

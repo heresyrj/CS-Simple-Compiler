@@ -24,32 +24,31 @@
 ;LINK
 ;WRITES input
 ;READI $L1
-;STOREI 1 $T1
-;NE $L1 $T1 label4
-;STOREI 1 $T2
-;STOREI $T2 $L2
+;STOREI 1 $T7
+;NE $L1 $T7 label4
+;STOREI 1 $T8
+;STOREI $T8 $L2
 ;JUMP label3
 ;LABEL label4
-;STOREI 1 $T3
-;LE $L1 $T3 label6
+;STOREI 1 $T9
+;LE $L1 $T9 label6
 ;PUSH
 ;PUSH $L1
 ;JSR factorial
 ;POP
-;POP $T4
-;STOREI $T4 $L2
+;POP $T10
+;STOREI $T10 $L2
 ;JUMP label5
 ;LABEL label6
-;STOREI 0 $T5
-;STOREI $T5 $L2
+;STOREI 0 $T11
+;STOREI $T11 $L2
 ;LABEL label5
 ;LABEL label3
 ;WRITEI $L2
 ;WRITES eol
-;STOREI 0 $T6
-;STOREI $T6 $R
+;STOREI 0 $T12
+;STOREI $T12 $R
 ;RET
-;tiny code
 str eol "\n"
 str input "Please enter an integer number: "
 push  
@@ -60,26 +59,26 @@ push r3
 jsr main 
 sys halt 
 label factorial 
-link 2 
+link 8 
 move 1 r2
 cmpi $6 r2
 jne label2 
-move 1 r2
-move r2 $7
+move 1 r3
+move r3 $7
 unlnk  
 ret  
 jmp label1 
 label label2 
 move 1 r2
-move $6 r3
-subi r2 r3
+move r2 r3
+subi $6 r3
 push  
-push r2 
+push r3 
 push r0 
 push r1 
 push r2 
 push r3 
-jmp factorial 
+jsr factorial 
 pop r3 
 pop r2 
 pop r1 
@@ -87,23 +86,23 @@ pop r0
 pop  
 pop r2 
 move r2 $-2
-move $-2 r2
-muli $6 r2
-move r2 $-1
+move $6 r3
+muli $-2 r3
+move r3 $-1
 label label1 
 move $-1 r2
 move r2 $7
 unlnk  
 ret  
 label main 
-link 2 
+link 8 
 sys writes input
 sys readi $-1
 move 1 r2
 cmpi $-1 r2
 jne label4 
-move 1 r2
-move r2 $-2
+move 1 r3
+move r3 $-2
 jmp label3 
 label label4 
 move 1 r2
@@ -115,7 +114,7 @@ push r0
 push r1 
 push r2 
 push r3 
-jmp factorial 
+jsr factorial 
 pop r3 
 pop r2 
 pop r1 

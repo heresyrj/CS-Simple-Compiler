@@ -51,7 +51,8 @@
 ;STOREI $T19 a
 ;JUMP label1
 ;LABEL label2
-;tiny code
+;RET
+
 var a 
 var b 
 var g 
@@ -66,52 +67,52 @@ push r3
 jsr main 
 sys halt 
 label main 
-link 0 
+link 19 
 move 1 r2
 move r2 b
-move 1 r2
-move r2 a
+move 1 r3
+move r3 a
 label label1 
 move 120 r2
 cmpr a r2
 jgt label2 
-move 1 r2
-cmpr b r2
+move 1 r3
+cmpr b r3
 jne label4 
-move 1 r2
-move r2 r3
-muli a r3
-move r2 g
+move 1 r0
+move a r1
+muli r0 r1
+move r1 g
 sys writei g
 jmp label3 
 label label4 
 move 2 r2
 cmpr b r2
 jne label6 
-move 2 r2
-move r2 r3
-muli a r3
-move r2 p
+move 2 r3
+move a r0
+muli r3 r0
+move r0 p
 sys writei p
 jmp label5 
 label label6 
 move 3 r2
 cmpr b r2
 jne label8 
-move 3 r2
-move r2 r3
-muli a r3
-move r2 k
+move 3 r3
+move a r0
+muli r3 r0
+move r0 k
 sys writei k
 jmp label7 
 label label8 
 move 4 r2
 cmpr b r2
 jne label10 
-move 4 r2
-move r2 r3
-muli a r3
-move r2 u
+move 4 r3
+move a r0
+muli r3 r0
+move r0 u
 sys writei u
 jmp label9 
 label label10 
@@ -120,13 +121,15 @@ label label7
 label label5 
 label label3 
 move 1 r2
-move b r3
-addi r2 r3
-move r2 b
-move 20 r2
-move a r3
-addi r2 r3
-move r2 a
+move r2 r3
+addi b r3
+move r3 b
+move 20 r0
+move r0 r1
+addi a r1
+move r1 a
 jmp label1 
 label label2 
+unlnk  
+ret  
 end

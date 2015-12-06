@@ -198,6 +198,10 @@ public class myASTbuilder extends MicroBaseListener {
     @Override
     public void exitProgram(MicroParser.ProgramContext programContext)
     {
+        if(!generalUtils.codeAggregete.get(generalUtils.codeAggregete.size()-1).contains("RET")) {
+            generalUtils.storeCode(";RET\n");
+        }
+
         //print IR
         generalUtils.compile();
     }

@@ -28,7 +28,8 @@
 ;LABEL label5
 ;LABEL label1
 ;WRITEI num
-;tiny code
+;RET
+
 var a 
 var num 
 var i 
@@ -40,24 +41,27 @@ push r3
 jsr main 
 sys halt 
 label main 
-link 0 
+link 9 
 move 7 r2
 move r2 num
-move 2 r2
-move r2 i
-move 42 r2
-move r2 a
-move 5 r2
-cmpr i r2
+move 2 r3
+move r3 i
+move 42 r0
+move r0 a
+move 5 r1
+cmpr i r1
 jge label2 
-move num r2
-addi a r2
+move $T5 r2
+move a r2
+addi num r2
 move r2 num
+move $T6 r2
 move 3 r2
 cmpr i r2
 jge label4 
-move num r2
-addi a r2
+move $T7 r2
+move a r2
+addi num r2
 move r2 num
 jmp label3 
 label label4 
@@ -67,12 +71,14 @@ label label2
 move 5 r2
 cmpr i r2
 jlt label6 
-move num r2
-subi a r2
-move r2 num
+move a r3
+subi num r3
+move r3 num
 jmp label5 
 label label6 
 label label5 
 label label1 
 sys writei num
+unlnk  
+ret  
 end

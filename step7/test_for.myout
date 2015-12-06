@@ -22,7 +22,8 @@
 ;JUMP label1
 ;LABEL label2
 ;WRITEF approx
-;tiny code
+;RET
+
 var newapprox 
 var num 
 var i 
@@ -36,34 +37,40 @@ push r3
 jsr main 
 sys halt 
 label main 
-link 0 
+link 10 
 move 7.0 r2
 move r2 num
-move 1 r2
-move r2 j
-move num r2
-move r2 approx
-move 100 r2
-move r2 i
+move 1 r3
+move r3 j
+move num r0
+move r0 approx
+move 100 r1
+move r1 i
 label label1 
 move 0 r2
 cmpr i r2
 jeq label2 
-move 0.5 r2
-move num r2
-divr approx r2
-move approx r3
-addr r2 r3
-move r2 r0
-mulr r3 r0
+move 0.5 r3
+move approx r0
+divr num r0
+move r0 r1
+addr approx r1
+move $T8 r2
+move r1 r2
+mulr r3 r2
 move r2 newapprox
 move newapprox r2
+move newapprox r2
 move r2 approx
+move $T9 r2
 move 1 r2
-move i r3
-subi r2 r3
-move r2 i
+move $T10 r3
+move r2 r3
+subi i r3
+move r3 i
 jmp label1 
 label label2 
 sys writer approx
+unlnk  
+ret  
 end

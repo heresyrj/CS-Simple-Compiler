@@ -6,8 +6,8 @@
 ;RET
 ;LABEL multiply
 ;LINK
-;MULTF $P1 $P2 $T1
-;STOREF $T1 $L1
+;MULTF $P1 $P2 $T2
+;STOREF $T2 $L1
 ;STOREF $L1 $R
 ;RET
 ;LABEL main
@@ -25,16 +25,16 @@
 ;JSR multiply
 ;POP
 ;POP
-;POP $T1
-;STOREF $T1 $L5
+;POP $T3
+;STOREF $T3 $L5
 ;PUSH
 ;PUSH $L5
 ;PUSH $L3
 ;JSR add
 ;POP
 ;POP
-;POP $T2
-;STOREF $T2 $L4
+;POP $T4
+;STOREF $T4 $L4
 ;WRITEF $L1
 ;WRITES star
 ;WRITEF $L2
@@ -43,10 +43,9 @@
 ;WRITES equal
 ;WRITEF $L4
 ;WRITES eol
-;STOREI 0 $T3
-;STOREI $T3 $R
+;STOREI 0 $T5
+;STOREI $T5 $R
 ;RET
-;tiny code
 str eol "\n"
 str star "*"
 str plus "+"
@@ -63,25 +62,25 @@ push r3
 jsr main 
 sys halt 
 label add 
-link 1 
-move $6 r2
-addr $7 r2
+link 2 
+move $7 r2
+addr $6 r2
 move r2 $-1
-move $-1 r2
-move r2 $8
+move $-1 r3
+move r3 $8
 unlnk  
 ret  
 label multiply 
-link 1 
-move $6 r2
-mulr $7 r2
+link 2 
+move $7 r2
+mulr $6 r2
 move r2 $-1
-move $-1 r2
-move r2 $8
+move $-1 r3
+move r3 $8
 unlnk  
 ret  
 label main 
-link 5 
+link 8 
 sys writes intro
 sys writes first
 sys readr $-1
@@ -96,7 +95,7 @@ push r0
 push r1 
 push r2 
 push r3 
-jmp multiply 
+jsr multiply 
 pop r3 
 pop r2 
 pop r1 
@@ -112,7 +111,7 @@ push r0
 push r1 
 push r2 
 push r3 
-jmp add 
+jsr add 
 pop r3 
 pop r2 
 pop r1 

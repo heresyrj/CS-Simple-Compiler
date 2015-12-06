@@ -24,7 +24,8 @@
 ;WRITEI c
 ;WRITEI b
 ;WRITEI a
-;tiny code
+;RET
+
 var a 
 var b 
 var c 
@@ -36,40 +37,54 @@ push r3
 jsr main 
 sys halt 
 label main 
-link 0 
+link 15 
 move 20 r2
 move r2 a
-move 30 r2
-move r2 b
-move 40 r2
-move r2 c
-move a r2
-muli b r2
-move c r3
-addi r2 r3
-move a r2
-muli b r2
-move r2 r3
-addi c r3
-move r2 r0
-divi a r0
-move r2 r1
-addi r3 r1
-move 20 r2
-move r3 r0
-addi r2 r0
-move r2 c
-move b r2
-muli b r2
-move r2 r3
-addi a r3
-move r2 b
+move 30 r3
+move r3 b
+move 40 r0
+move r0 c
+move b r1
+muli a r1
+move $T5 r2
+move r1 r2
+addi c r2
+move $T6 r2
 move b r2
 muli a r2
+move $T7 r3
+move c r3
+addi r2 r3
+move $T8 r2
+move a r2
+divi r3 r2
+move $T5 r3
+move $T9 r0
+move r2 r0
+addi r3 r0
+move $T10 r2
+move 20 r2
+move $T11 r3
 move r2 r3
-divi a r3
-move r2 a
+addi r0 r3
+move r3 c
+move $T12 r2
+move b r2
+muli b r2
+move $T13 r3
+move a r3
+addi r2 r3
+move r3 b
+move $T14 r2
+move a r2
+muli b r2
+move $T15 r3
+move a r3
+divi r2 r3
+move r3 a
 sys writei c
 sys writei b
 sys writei a
+unlnk  
+ret  
 end

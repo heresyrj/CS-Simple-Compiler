@@ -48,7 +48,8 @@
 ;LABEL label2
 ;WRITEF approx
 ;WRITEI count
-;tiny code
+;RET
+
 var num 
 var count 
 var diff 
@@ -64,44 +65,53 @@ push r3
 jsr main 
 sys halt 
 label main 
-link 0 
+link 18 
 move 0.0001 r2
 move r2 tolerance
-move 7.0 r2
-move r2 num
-move num r2
-move r2 approx
-move 0 r2
-move r2 count
+move 7.0 r3
+move r3 num
+move num r0
+move r0 approx
+move 0 r1
+move r1 count
+move $T4 r2
 move 0.0 r2
 move r2 diff
+move $T5 r2
 move 0 r2
 move r2 enough
 label label1 
 move 1 r2
 cmpr enough r2
 jeq label2 
-move 1 r2
-move count r3
-addi r2 r3
-move r2 count
-move 0.5 r2
-move num r2
-divr approx r2
-move approx r3
-addr r2 r3
-move r2 r0
-mulr r3 r0
-move r2 newapprox
+move 1 r3
+move r3 r0
+addi count r0
+move r0 count
+move 0.5 r1
+move $T10 r2
 move approx r2
-subr newapprox r2
+divr num r2
+move $T11 r3
+move r2 r3
+addr approx r3
+move $T12 r2
+move r3 r2
+mulr r1 r2
+move r2 newapprox
+move $T13 r2
+move newapprox r2
+subr approx r2
 move r2 diff
+move $T14 r2
 move 0.0 r2
 cmpr diff r2
 jle label4 
 move diff r2
-cmpr r2 tolerance
+move diff r2
+cmpr tolerance r2
 jge label6 
+move $T15 r2
 move 1 r2
 move r2 enough
 jmp label5 
@@ -110,12 +120,12 @@ label label5
 jmp label3 
 label label4 
 move 0.0 r2
-move r2 r3
-subr tolerance r3
-cmpr diff r2
+move tolerance r3
+subr r2 r3
+cmpr diff r3
 jle label8 
-move 1 r2
-move r2 enough
+move 1 r0
+move r0 enough
 jmp label7 
 label label8 
 label label7 
@@ -126,4 +136,6 @@ jmp label1
 label label2 
 sys writer approx
 sys writei count
+unlnk  
+ret  
 end

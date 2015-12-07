@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9ac91e7c-96db-4785-85d5-47edad1b398d" name="Default" comment="" />
+    <list default="true" id="9ac91e7c-96db-4785-85d5-47edad1b398d" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/step7hints.pdf" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/regAllocToolkit.java" afterPath="$PROJECT_DIR$/src/regAllocToolkit.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/toTiny.java" afterPath="$PROJECT_DIR$/src/toTiny.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/step7.iml" afterPath="$PROJECT_DIR$/step7.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testcases/output/test_for.out" afterPath="$PROJECT_DIR$/testcases/output/test_for.out" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testcases/output/test_if.out" afterPath="$PROJECT_DIR$/testcases/output/test_if.out" />
+    </list>
     <ignored path="step7.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -25,40 +32,11 @@
       <file leaf-file-name="regAllocToolkit.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/regAllocToolkit.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8226691">
-              <caret line="49" column="20" selection-start-line="49" selection-start-column="20" selection-end-line="49" selection-end-column="20" />
+            <state vertical-scroll-proportion="1.275405">
+              <caret line="167" column="11" selection-start-line="167" selection-start-column="11" selection-end-line="167" selection-end-column="11" />
               <folding>
                 <element signature="class#register#0;class#regAllocToolkit#0" expanded="false" />
                 <element signature="method#initializeRegisters#0;class#regAllocToolkit#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="toTiny.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/toTiny.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="180" column="57" selection-start-line="180" selection-start-column="57" selection-end-line="180" selection-end-column="57" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#isCmp#0;class#toTiny#0" expanded="false" />
-                <element signature="method#isArithmatic#0;class#toTiny#0" expanded="false" />
-                <element signature="method#getCase#0;class#toTiny#0" expanded="false" />
-                <element signature="method#getType#0;class#toTiny#0" expanded="false" />
-                <element signature="method#getMathOpCode#0;class#toTiny#0" expanded="false" />
-                <element signature="method#numOfTemporals#0;class#toTiny#0" expanded="false" />
-                <element signature="method#calculateSpcaceNeeded#0;class#toTiny#0" expanded="false" />
-                <element signature="method#registerPush#0;class#toTiny#0" expanded="false" />
-                <element signature="method#registerPop#0;class#toTiny#0" expanded="false" />
-                <element signature="method#linkHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#headerHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#retHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#jpHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#jrHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#ppHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#storeHandler#0;class#toTiny#0" expanded="false" />
-                <element signature="method#wrHandler#0;class#toTiny#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -79,8 +57,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/strSymbol.java" />
-        <option value="$PROJECT_DIR$/src/Symbol_STRING.java" />
         <option value="$PROJECT_DIR$/src/IRNode.java" />
         <option value="$PROJECT_DIR$/src/IR.java" />
         <option value="$PROJECT_DIR$/src/ASTnode_PreFUNCTION.java" />
@@ -128,15 +104,16 @@
         <option value="$PROJECT_DIR$/src/Symbol_Func.java" />
         <option value="$PROJECT_DIR$/src/generalUtils.java" />
         <option value="$PROJECT_DIR$/src/myASTbuilder.java" />
-        <option value="$PROJECT_DIR$/src/toTiny.java" />
+        <option value="$PROJECT_DIR$/testcases/output/test_if.out" />
         <option value="$PROJECT_DIR$/src/regAllocToolkit.java" />
+        <option value="$PROJECT_DIR$/testcases/output/test_for.out" />
+        <option value="$PROJECT_DIR$/src/toTiny.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="4" />
     <option name="y" value="23" />
-    <option name="width" value="1436" />
+    <option name="width" value="1440" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -164,6 +141,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -172,71 +152,8 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testcases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="output" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testcases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="input" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="step7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -263,7 +180,7 @@
     <configuration default="false" name="Micro" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Micro" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/testcases/input/test_for.micro" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/testcases/input/test_adv.micro" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -378,8 +295,8 @@
     <configuration />
   </component>
   <component name="ToolWindowManager">
-    <frame x="4" y="23" width="1436" height="877" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1440" height="877" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Tool Output" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -387,14 +304,14 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299363" sideWeight="0.503876" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299363" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26751593" sideWeight="0.49753347" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2267516" sideWeight="0.49753347" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2254417" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.119802676" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Statistic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6522293" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="ANTLR Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299363" sideWeight="0.49612403" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24947146" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5783439" sideWeight="0.49753347" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.064968154" sideWeight="0.49753347" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -457,209 +374,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/regAllocToolkit.java</url>
-          <line>61</line>
-          <properties class="regAllocToolkit" method="chooseRegToFree" />
-          <option name="timeStamp" value="161" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/toTiny.java</url>
-          <line>175</line>
-          <properties class="toTiny" method="getNameForVar" />
-          <option name="timeStamp" value="162" />
+          <line>119</line>
+          <properties class="regAllocToolkit" method="allocate" />
+          <option name="timeStamp" value="196" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="163" />
+      <option name="time" value="198" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/regAllocToolkit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="class#register#0;class#regAllocToolkit#0" expanded="false" />
-            <element signature="method#initializeRegisters#0;class#regAllocToolkit#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Symbol_Func.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="39" column="22" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/toTiny.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="494" column="0" selection-start-line="494" selection-start-column="0" selection-end-line="494" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#isCmp#0;class#toTiny#0" expanded="false" />
-            <element signature="method#isArithmatic#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getCase#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getType#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getMathOpCode#0;class#toTiny#0" expanded="false" />
-            <element signature="method#numOfTemporals#0;class#toTiny#0" expanded="false" />
-            <element signature="method#calculateSpcaceNeeded#0;class#toTiny#0" expanded="false" />
-            <element signature="method#registerPush#0;class#toTiny#0" expanded="false" />
-            <element signature="method#registerPop#0;class#toTiny#0" expanded="false" />
-            <element signature="method#linkHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#headerHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#retHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#jpHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#jrHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#ppHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#storeHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#wrHandler#0;class#toTiny#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/regAllocToolkit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
-          <folding>
-            <element signature="class#register#0;class#regAllocToolkit#0" expanded="false" />
-            <element signature="method#initializeRegisters#0;class#regAllocToolkit#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Symbol_Func.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="39" column="22" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/toTiny.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#isCmp#0;class#toTiny#0" expanded="false" />
-            <element signature="method#isArithmatic#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getCase#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getType#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getMathOpCode#0;class#toTiny#0" expanded="false" />
-            <element signature="method#numOfTemporals#0;class#toTiny#0" expanded="false" />
-            <element signature="method#calculateSpcaceNeeded#0;class#toTiny#0" expanded="false" />
-            <element signature="method#registerPush#0;class#toTiny#0" expanded="false" />
-            <element signature="method#registerPop#0;class#toTiny#0" expanded="false" />
-            <element signature="method#linkHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#headerHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#retHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#jpHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#jrHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#ppHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#storeHandler#0;class#toTiny#0" expanded="false" />
-            <element signature="method#wrHandler#0;class#toTiny#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tiny4regs.C">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.43083">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Symbol_Float.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.05944518">
-          <caret line="3" column="25" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ASTNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2972259">
-          <caret line="15" column="19" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ASTNode_Return.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8018494">
-          <caret line="48" column="22" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ASTNode_Cmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.0769231">
-          <caret line="65" column="31" selection-start-line="65" selection-start-column="27" selection-end-line="65" selection-end-column="31" />
-          <caret line="68" column="31" selection-start-line="68" selection-start-column="27" selection-end-line="68" selection-end-column="31" />
-          <caret line="71" column="31" selection-start-line="71" selection-start-column="27" selection-end-line="71" selection-end-column="31" />
-          <caret line="74" column="31" selection-start-line="74" selection-start-column="27" selection-end-line="74" selection-end-column="31" />
-          <caret line="77" column="31" selection-start-line="77" selection-start-column="27" selection-end-line="77" selection-end-column="31" />
-          <caret line="80" column="31" selection-start-line="80" selection-start-column="27" selection-end-line="80" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ASTNode_Op.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0948718">
-          <caret line="3" column="13" selection-start-line="3" selection-start-column="13" selection-end-line="3" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_20.jdk/Contents/Home/src.zip!/java/lang/System.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="58" column="19" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tinyNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.13870542">
-          <caret line="7" column="70" selection-start-line="7" selection-start-column="70" selection-end-line="7" selection-end-column="70" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="49" column="46" selection-start-line="49" selection-start-column="46" selection-end-line="49" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Symbol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2972259">
-          <caret line="15" column="24" selection-start-line="15" selection-start-column="24" selection-end-line="15" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Symbol_Str.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="3" column="13" selection-start-line="3" selection-start-column="13" selection-end-line="3" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/myErrorHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.05944518">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/testcases/output/fibonacci2.out">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -697,73 +421,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testcases/output/test_if.out">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="61" column="9" selection-start-line="0" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_if.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.57377046">
-          <caret line="34" column="6" selection-start-line="34" selection-start-column="6" selection-end-line="34" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/factorial2.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.12739725">
-          <caret line="54" column="6" selection-start-line="54" selection-start-column="6" selection-end-line="54" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_for.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8718626">
-          <caret line="44" column="9" selection-start-line="44" selection-start-column="9" selection-end-line="44" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/testcases/input/test_adv.micro">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testcases/output/test_adv.out">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.0933014">
-          <caret line="101" column="0" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_if.result">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35519126">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_expr.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_adv.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6557377">
-          <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fma.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="102" column="7" selection-start-line="102" selection-start-column="7" selection-end-line="102" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -774,24 +435,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fibonacci2.myout">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="162" column="11" selection-start-line="164" selection-start-column="0" selection-end-line="165" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../step6/testcases/output/fibonacci2.out">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-53.333332">
           <caret line="96" column="10" selection-start-line="96" selection-start-column="10" selection-end-line="96" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testcases/output/fma.out">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="189" column="13" selection-start-line="189" selection-start-column="13" selection-end-line="189" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -815,30 +462,6 @@
         <state vertical-scroll-proportion="0.119521916">
           <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/MicroBaseListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.518518">
-          <caret line="218" column="4" selection-start-line="218" selection-start-column="4" selection-end-line="218" selection-end-column="77" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testcases/input/fma.micro">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_for.result">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state />
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -880,13 +503,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testcases/output/test_for.out">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4945055">
-          <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Symbol_Func.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -894,21 +510,68 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/toTiny.java">
+    <entry file="file://$PROJECT_DIR$/testcases/input/fma.micro">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.67164177">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcases/output/test_if.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.62749445">
+          <caret line="200" column="12" selection-start-line="200" selection-start-column="12" selection-end-line="200" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcases/output/test_for.out">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="180" column="57" selection-start-line="180" selection-start-column="57" selection-end-line="180" selection-end-column="57" />
+          <caret line="173" column="26" selection-start-line="173" selection-start-column="26" selection-end-line="173" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcases/output/fma.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.5835694">
+          <caret line="81" column="7" selection-start-line="81" selection-start-column="7" selection-end-line="81" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcases/output/test_adv.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9722222">
+          <caret line="28" column="11" selection-start-line="28" selection-start-column="11" selection-end-line="28" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcases/output/test_expr.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.512748">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/toTiny.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.41531664">
+          <caret line="515" column="28" selection-start-line="515" selection-start-column="28" selection-end-line="515" selection-end-column="28" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#isCmp#0;class#toTiny#0" expanded="false" />
-            <element signature="method#isArithmatic#0;class#toTiny#0" expanded="false" />
-            <element signature="method#getCase#0;class#toTiny#0" expanded="false" />
+            <element signature="e#1679#1680#0" expanded="true" />
+            <element signature="e#1723#1724#0" expanded="true" />
             <element signature="method#getType#0;class#toTiny#0" expanded="false" />
             <element signature="method#getMathOpCode#0;class#toTiny#0" expanded="false" />
-            <element signature="method#numOfTemporals#0;class#toTiny#0" expanded="false" />
-            <element signature="method#calculateSpcaceNeeded#0;class#toTiny#0" expanded="false" />
             <element signature="method#registerPush#0;class#toTiny#0" expanded="false" />
             <element signature="method#registerPop#0;class#toTiny#0" expanded="false" />
+            <element signature="method#numOfTemporals#0;class#toTiny#0" expanded="false" />
+            <element signature="method#calculateSpcaceNeeded#0;class#toTiny#0" expanded="false" />
+            <element signature="method#labelHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#linkHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#headerHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#retHandler#0;class#toTiny#0" expanded="false" />
@@ -916,6 +579,7 @@
             <element signature="method#jrHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#ppHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#storeHandler#0;class#toTiny#0" expanded="false" />
+            <element signature="method#cmpHandler#0;class#toTiny#0" expanded="false" />
             <element signature="method#wrHandler#0;class#toTiny#0" expanded="false" />
           </folding>
         </state>
@@ -923,8 +587,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/regAllocToolkit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8226691">
-          <caret line="49" column="20" selection-start-line="49" selection-start-column="20" selection-end-line="49" selection-end-column="20" />
+        <state vertical-scroll-proportion="1.275405">
+          <caret line="167" column="11" selection-start-line="167" selection-start-column="11" selection-end-line="167" selection-end-column="11" />
           <folding>
             <element signature="class#register#0;class#regAllocToolkit#0" expanded="false" />
             <element signature="method#initializeRegisters#0;class#regAllocToolkit#0" expanded="false" />

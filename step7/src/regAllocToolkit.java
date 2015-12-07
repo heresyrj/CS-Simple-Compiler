@@ -108,8 +108,9 @@ public class regAllocToolkit {
         register reg = registerMapping.get(r);
         if (reg.dirty && isAlive(reg.valueStored, currentNode)) {
             /**generate store*/
+            //System.out.println(reg.name+" is dirty and stores "+reg.valueStored);
             tinyNode codeForStore = new tinyNode("move ", reg.name,reg.valueStored);
-            toTiny.nodeListTiny.add(codeForStore);
+            toTiny.addTolist(codeForStore);
             /**insert the code**/
         }
         reg.valueStored = null;
@@ -119,20 +120,30 @@ public class regAllocToolkit {
     private register allocate (String var) {
         //to get a register
 
+        /** there are two cases
+         * 1. is $T  --> basically means give me an free reg
+         * 2. not $T
+         * */
+
+
         //if there's free register
         //pick any of them
+        freeDead(currentNode);
         register r = getAFreeRegister();
         if(r == null) {
             r = chooseRegToFree(currentNode);
             assert r != null;
             free(r.name);
         }
-        //put value in the register object
-        r.valueStored = var;
-        r.dirty = true;
-        //load the var into this register
-        tinyNode loadNewValue = new tinyNode("move", r.valueStored, r.name);
-        toTiny.nodeListTiny.add(loadNewValue);
+
+        if(!var.contains("$T")) {
+            //put value in the register object
+            r.valueStored = var;
+            r.dirty = true;
+            //load the var into this register
+            toTiny.addTolist(new tinyNode("move", r.valueStored, r.name));
+        }
+
         return r;
     }
 
@@ -141,9 +152,8 @@ public class regAllocToolkit {
         for (register r : registerMapping.values()) {
 
             if(globals.contains(r.valueStored) && r.dirty) {
-                toTiny.nodeListTiny.add(new tinyNode("move", r.name, r.valueStored));
+                toTiny.addTolist(new tinyNode("move", r.name, r.valueStored));
             }
-
             r.valueStored = null;
             r.dirty = false;
         }
@@ -166,7 +176,6 @@ public class regAllocToolkit {
                     //System.out.print("; "+r.name+" is freed; ");
                 }
             }
-
         }
         //System.out.println();
     }

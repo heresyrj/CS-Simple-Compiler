@@ -105,12 +105,13 @@ public class regAllocToolkit {
     }
 
     public void free (String r) {
+
         register reg = registerMapping.get(r);
         if (reg.dirty && isAlive(reg.valueStored, currentNode)) {
+            if(!reg.valueStored.contains("$"))
             /**generate store*/
             //System.out.println(reg.name+" is dirty and stores "+reg.valueStored);
-            tinyNode codeForStore = new tinyNode("move ", reg.name,reg.valueStored);
-            toTiny.addTolist(codeForStore);
+            toTiny.addTolist(new tinyNode("move ", reg.name,reg.valueStored));
             /**insert the code**/
         }
         reg.valueStored = null;
@@ -124,7 +125,6 @@ public class regAllocToolkit {
          * 1. is $T  --> basically means give me an free reg
          * 2. not $T
          * */
-
 
         //if there's free register
         //pick any of them

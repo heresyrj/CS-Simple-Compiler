@@ -105,8 +105,14 @@ public class DataFlow {
             addToSet(node.operand2, Require);
             addToSet(node.result, ReDefine);
         } else if (isStore(op)) {
-            addToSet(node.operand1, Require);
-            addToSet(node.result, ReDefine);
+            //if store # $T, $T should be preserved for later use || fix the liveness bug
+            if((generalUtils.isFloat(node.operand1) || generalUtils.isFloat(node.operand1)) && node.result.contains("$")){
+                addToSet(node.result, Require);//to prevent it from being freed before use
+            } else {
+                addToSet(node.operand1, Require);
+                addToSet(node.result, ReDefine);
+            }
+
         } else if (isCmp(op)) {
             addToSet(node.operand1, Require);
             addToSet(node.operand2, Require);

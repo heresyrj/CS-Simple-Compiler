@@ -39,9 +39,16 @@ public class toTiny {
         printTiny();
     }
 
-    /**
-     * return num of "$L" in a function
-     */
+    private String getCurrentFunc(IRnode node) {
+        int nodeIndex = IRnodes.indexOf(node);
+        for (String func : funcBoundaries.keySet()) {
+            int[] boundry = funcBoundaries.get(func);
+            if (nodeIndex >= boundry[0] && nodeIndex <= boundry[1])
+                return func;
+        }
+        return "ERR";
+    }
+
     private int getNumOfLocalVars(String funcName) {
         return ((Symbol_Func) generalUtils.SymbolTable.get(funcName)).getNumOfLocals();
     }
@@ -134,16 +141,6 @@ public class toTiny {
         }
     }
 
-    private String getCurrentFunc(IRnode node) {
-        int nodeIndex = IRnodes.indexOf(node);
-        for (String func : funcBoundaries.keySet()) {
-            int[] boundry = funcBoundaries.get(func);
-            if (nodeIndex >= boundry[0] && nodeIndex <= boundry[1])
-                return func;
-        }
-        return "ERR";
-    }
-
     private void generateTinyNodes() {
 
         headerHandler();
@@ -195,7 +192,9 @@ public class toTiny {
             result = toolkit.returnRegisterName(operand);
         } else if(isGlobal(operand)) {
             result = operand;
-        }  else {
+        } else if(operand.contains("$L") || operand.contains("$R")) {
+            result = findMapping.get(getCurrentFunc(node)).get(operand);
+        } else {
             result = toolkit.ensure(operand);
         }
 
@@ -371,11 +370,9 @@ public class toTiny {
         toolkit.setCurrentNode(node);
 
         String cmd;
-        if (node.opCode.contains("PUSH")) {
-            cmd = "push";
-        } else {
-            cmd = "pop";
-        }
+        if (node.opCode.contains("PUSH")) cmd = "push";
+        else cmd = "pop";
+
 
         String target = "";
         if (node.result != null) {
@@ -497,7 +494,7 @@ public class toTiny {
         addTolist(new tinyNode(cmd1, cmd2, target));
 
 
-        toolkit.freeDead(node);
+        //toolkit.freeDead(node);
     }
 
     private void arithHandler(IRnode node) {

@@ -13,14 +13,9 @@ java -cp lib/antlr.jar:classes/ Micro testcases/input/test_expr.micro > test_exp
 java -cp lib/antlr.jar:classes/ Micro testcases/input/test_if.micro > test_if.myout
 java -cp lib/antlr.jar:classes/ Micro testcases/input/test_for.micro > test_for.myout
 
-
-# rm tiny
-# g++ -o tiny tinyNew.C 
-# chmod +x tiny
-
-# rm tiny
-# g++ -o tiny tiny4regs.C 
-# chmod +x tiny
+rm tiny
+g++ -o tiny tiny4regs.C 
+chmod +x tiny
 
 ./tiny test_if.myout < ./testcases/input/test_if.input > test_if.result
 ./tiny test_for.myout < ./testcases/input/test_for.input > test_for.result
@@ -46,12 +41,13 @@ java -cp lib/antlr.jar:classes/ Micro testcases/input/test_for.micro > test_for.
 
 
 ./tiny fma.myout < ./testcases/input/fma.input > fma.result
-./tiny factorial2.myout < ./testcases/input/factorial2.input > factorial2.result
-./tiny fibonacci2.myout < ./testcases/input/fibonacci2.input > fibonacci2.result
-
 ./tiny ./testcases/output/fma.out < ./testcases/input/fma.input > fma.answer
-./tiny ./testcases/output/factorial2.out < ./testcases/input/factorial2.input > factorial2.answer
+
+./tiny fibonacci2.myout < ./testcases/input/fibonacci2.input > fibonacci2.result
 ./tiny ./testcases/output/fibonacci2.out < ./testcases/input/fibonacci2.input > fibonacci2.answer
+
+./tiny factorial2.myout < ./testcases/input/factorial2.input > factorial2.result
+./tiny ./testcases/output/factorial2.out < ./testcases/input/factorial2.input > factorial2.answer
 
 
 

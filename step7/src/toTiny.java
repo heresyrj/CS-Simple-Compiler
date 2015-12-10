@@ -406,7 +406,6 @@ public class toTiny {
             addTolist(store);
         }
 
-
         toolkit.freeDead(node);
     }
 
@@ -431,17 +430,30 @@ public class toTiny {
         boolean cond2 = isGlobal(target1) || isGlobal(target2);
 
         if (cond1 || cond2) {
-            if(isGlobal(target1)) {
+            if(cond1) {
                 String reg_target1 = toolkit.ensure(target1);
                 addTolist(new tinyNode("move", target1, reg_target1 ));
                 target1 = reg_target1;
-            }
-            if(isGlobal(target2)) {
                 String reg_target2 = toolkit.ensure(target2);
                 addTolist(new tinyNode("move", target2, reg_target2 ));
                 target2 = reg_target2;
             }
+            else {
+                if(isGlobal(target1)) {
+                    String reg_target1 = toolkit.ensure(target1);
+                    addTolist(new tinyNode("move", target1, reg_target1 ));
+                    target1 = reg_target1;
+                }
+                if(isGlobal(target2)) {
+                    String reg_target2 = toolkit.ensure(target2);
+                    addTolist(new tinyNode("move", target2, reg_target2 ));
+                    target2 = reg_target2;
+                }
+
+            }
+
             addTolist(new tinyNode(cmd, target1, target2));
+
         } else {
             addTolist(new tinyNode(cmd, target1, target2));
         }
@@ -494,7 +506,7 @@ public class toTiny {
         addTolist(new tinyNode(cmd1, cmd2, target));
 
 
-        //toolkit.freeDead(node);
+        toolkit.freeDead(node);
     }
 
     private void arithHandler(IRnode node) {

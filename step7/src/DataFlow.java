@@ -22,46 +22,95 @@ public class DataFlow {
         livenessAnalysis();
         //debug();
     }
+
     public HashMap<String, int[]> getFuncBoundaries () {return funcBoundaries;}
     private boolean isCmp(String op) {
         return op.contains("NE") || op.contains("EQ") || (op.contains("GE")&&!op.contains("MERGE")) || op.contains("LE")
                 || op.contains("GT") || (op.contains("LT") && !op.contains("MUL"));
     }
-
     private boolean isFormat(String op) {
         return op.contains("LABEL") || op.contains("LINK");
     }
-
     private boolean isRet(String op) {
         return op.contains("RET");
     }
-
     private boolean isArithmatic(String op) {
         return op.contains("ADD") || op.contains("SUB") || op.contains("MULT") || op.contains("DIV");
     }
-
     private boolean isStore(String op) {
         return op.contains("STORE");
     }
-
     private boolean isIO(String op) {
         return op.contains("READ") || op.contains("WRITE");
     }
-
     private boolean isStackOP(String op) {
         return op.contains("PUSH") || op.contains("POP");
     }
-
     private boolean isJump(String op) {
         return op.contains("JUMP");
     }
-
     private boolean isJSR(String op) {
         return op.contains("JSR");
     }
-
     private boolean isMerge(String op) {
         return op.contains("MERGE");
+    }
+
+
+    private void getFunctionInfo() {
+        HashSet<String> allFuncs = CFG.getAllFuncs();
+        for (String func : allFuncs) {
+            /** Step1: find the boundaries for this func */
+            int boundaries[] = new int[2];
+            boundaries[0] = CFG.getFuncEnter(func);
+            HashSet<Integer> funcRets = CFG.getFuncExit(func);
+            int funcEnd = -1;
+            for (int ret : funcRets) {
+                if (ret >= funcEnd) funcEnd = ret;
+            }
+            boundaries[1] = funcEnd;
+            funcBoundaries.put(func, boundaries);
+            //System.out.println(func+" starts at "+funcBoundaries.get(func)[0]+" ends at "+funcBoundaries.get(func)[1]);
+        }
+    }
+    private HashSet<Integer> getPredecessors(int currentNodeIndex) {
+        return reverseAdjacency.get(currentNodeIndex);
+    }
+    private HashSet<Integer> getSuccessors(int currentNodeIndex) {
+        return adjacency.get(currentNodeIndex);
+    }
+    private HashSet<String> union(HashSet<String> set1, HashSet<String> set2) {
+        HashSet<String> unionSet = new HashSet<>();
+        if(set1 != null) {
+            for (String i : set1) {
+                unionSet.add(i);
+            }
+        }
+        if(set2 != null) {
+            for (String j : set2) {
+                unionSet.add(j);
+            }
+        }
+        return unionSet;
+    }
+    private HashSet<String> subtract(HashSet<String> set1, HashSet<String> set2) {
+        HashSet<String> set = (HashSet<String>) set1.clone();
+        //set1 - set2
+        for (String i : set1) {
+            if (set2.contains(i))
+                set.remove(i);
+        }
+        return set;
+    }
+    public HashSet<String> addToSet(String s, HashSet<String> set) {
+        if (!(generalUtils.isInteger(s) || generalUtils.isFloat(s)))
+            set.add(s);
+        return set;
+    }
+    public HashSet<String> removeFromSet(String s, HashSet<String> set) {
+        if (!(generalUtils.isInteger(s) || generalUtils.isFloat(s)))
+            set.remove(s);
+        return set;
     }
 
     private void initialization() {
@@ -70,8 +119,40 @@ public class DataFlow {
         for (IRnode node : nodesList) {
             transfer(node);
         }
-    }
+        for (IRnode node : nodesList) {
+            if(isArithmatic(node.opCode))
+                verify(node);
+        }
 
+    }
+    private void verify(IRnode node) {
+        /** this function modify the liveness of each node
+         * by adding back necessary temporals to the Require set
+         * the MULT T1 T2 T3
+         *     add T4 T5
+         *     move T3 a
+         *     since T3 is not immediately required in the following line
+         *     it will be freed and the value in T3 will be changed and
+         *     cause problem
+         **/
+        String currentResult = node.result;
+        int next = nodesList.indexOf(node)+1;
+
+        while(true) {
+            IRnode nextNode = nodesList.get(next);
+            if(currentResult.contains("$T") && !nextNode.getRequire().contains(currentResult)) {
+                HashSet<String> newRequire = nextNode.getRequire();
+                newRequire.add(node.result);
+                node.setRequire(newRequire);
+            } else {
+                break;
+            }
+
+            next++;
+        }
+
+
+    }
     private void transfer(IRnode node) {
         /** when generate the two SETs
          * they are independent info
@@ -104,6 +185,7 @@ public class DataFlow {
             addToSet(node.operand1, Require);
             addToSet(node.operand2, Require);
             addToSet(node.result, ReDefine);
+
         } else if (isStore(op)) {
             //if store # $T, $T should be preserved for later use || fix the liveness bug
             if((generalUtils.isFloat(node.operand1) || generalUtils.isFloat(node.operand1)) && node.result.contains("$")){
@@ -124,63 +206,6 @@ public class DataFlow {
         node.setRequire(Require);
         node.setReDefine(ReDefine);
     }
-
-    private void getFunctionInfo() {
-        HashSet<String> allFuncs = CFG.getAllFuncs();
-        for (String func : allFuncs) {
-            /** Step1: find the boundaries for this func */
-            int boundaries[] = new int[2];
-            boundaries[0] = CFG.getFuncEnter(func);
-            HashSet<Integer> funcRets = CFG.getFuncExit(func);
-            int funcEnd = -1;
-            for (int ret : funcRets) {
-                if (ret >= funcEnd) funcEnd = ret;
-            }
-            boundaries[1] = funcEnd;
-            funcBoundaries.put(func, boundaries);
-            //System.out.println(func+" starts at "+funcBoundaries.get(func)[0]+" ends at "+funcBoundaries.get(func)[1]);
-        }
-    }
-
-    private HashSet<Integer> getPredecessors(int currentNodeIndex) {
-        return reverseAdjacency.get(currentNodeIndex);
-    }
-
-    private HashSet<Integer> getSuccessors(int currentNodeIndex) {
-        return adjacency.get(currentNodeIndex);
-    }
-
-    private HashSet<String> union(HashSet<String> set1, HashSet<String> set2) {
-        HashSet<String> unionSet = new HashSet<>();
-        if(set1 != null) {
-            for (String i : set1) {
-                unionSet.add(i);
-            }
-        }
-        if(set2 != null) {
-            for (String j : set2) {
-                unionSet.add(j);
-            }
-        }
-        return unionSet;
-    }
-
-    private HashSet<String> subtract(HashSet<String> set1, HashSet<String> set2) {
-        HashSet<String> set = (HashSet<String>) set1.clone();
-        //set1 - set2
-        for (String i : set1) {
-            if (set2.contains(i))
-                set.remove(i);
-        }
-        return set;
-    }
-
-    public HashSet<String> addToSet(String s, HashSet<String> set) {
-        if (!(generalUtils.isInteger(s) || generalUtils.isFloat(s)))
-            set.add(s);
-        return set;
-    }
-
     private void IOcalculation(IRnode node, ArrayList<IRnode> worklist) {
         /** when calculate the liveness
          * MUST follow CGF path when proceed */
@@ -217,7 +242,6 @@ public class DataFlow {
         }
 
     }
-
     private void livenessAnalysis() {
 
         ArrayList<IRnode> worklist = (ArrayList<IRnode>) nodesList.clone();
@@ -229,6 +253,8 @@ public class DataFlow {
 
     }
 
+
+
     private void debug() {
         for(IRnode thisNode: nodesList) {
             printNode(thisNode);
@@ -236,7 +262,6 @@ public class DataFlow {
             System.out.print("\n");
         }
     }
-
     private void printNode(IRnode node) {
 
         System.out.print("Node " + nodesList.indexOf(node));
@@ -264,8 +289,12 @@ public class DataFlow {
         }
         System.out.print(") ");
     }
-
     private void printNodeLiveness(IRnode node) {
+        System.out.print("live-in {");
+        for (String var : node.getLiveIN()) {
+            System.out.print(var + " ");
+        }
+        System.out.print("}");
 
         System.out.print("liveness {");
         for (String var : node.getLiveOUT()) {
@@ -273,6 +302,5 @@ public class DataFlow {
         }
         System.out.print("}");
     }
-
 
 }

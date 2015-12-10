@@ -134,6 +134,9 @@ public class regAllocToolkit {
             r = chooseRegToFree(currentNode);
             assert r != null;
             free(r.name);
+        } else {
+            r.valueStored = var;
+            r.dirty = true;
         }
 
         if(!var.contains("$T")) {

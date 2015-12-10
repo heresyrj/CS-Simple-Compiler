@@ -192,7 +192,7 @@ public class toTiny {
             result = toolkit.returnRegisterName(operand);
         } else if(isGlobal(operand)) {
             result = operand;
-        } else if(operand.contains("$L") || operand.contains("$R")) {
+        } else if(operand.contains("$L") || operand.contains("$R") || operand.contains("$P")) {
             result = findMapping.get(getCurrentFunc(node)).get(operand);
         } else {
             result = toolkit.ensure(operand);
